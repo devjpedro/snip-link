@@ -1,4 +1,8 @@
+import { resolve } from "node:path";
+import { config } from "dotenv";
 import z from "zod";
+
+config({ path: resolve(process.cwd(), "../../.env") });
 
 const DEFAULT_PORT = 3333;
 

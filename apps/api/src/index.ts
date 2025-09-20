@@ -1,9 +1,7 @@
 import { env } from "@snip-link/env";
 import { Elysia } from "elysia";
 
-const PORT = env.PORT;
-
-const app = new Elysia().get("/", () => "hi").listen(PORT);
+const app = new Elysia().get("/", () => "hi").listen(env.PORT);
 
 // biome-ignore lint/suspicious/noConsole: <Necessary for logging>
 console.log(
