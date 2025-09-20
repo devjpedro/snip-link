@@ -1,0 +1,23 @@
+{
+  "name": "@snip-link/tsconfig",
+  "version": "1.0.0",
+  "description": "Shared TypeScript configurations for Snip Link project",
+  "private": true,
+  "exports": {
+    "./base.json": "./base.json",
+    "./web.json": "./web.json",
+    "./api.json": "./api.json"
+  },
+  "files": [
+    "base.json",
+    "web.json",
+    "api.json"
+  ],
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
