@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny lint/suspicious/noAssignInExpressions lint/style/noMagicNumbers: <Necessary> */
 
 import Elysia from "elysia";
-import { auth } from "@/lib/auth";
+import { auth } from "../lib/auth";
 
 let _schema: ReturnType<typeof auth.api.generateOpenAPISchema>;
 const getSchema = async () => (_schema ??= auth.api.generateOpenAPISchema());
@@ -15,7 +15,7 @@ export const betterAuthPlugin = new Elysia({ name: "better-auth" })
           headers,
         });
 
-        if (!session) return status(401);
+        if (!session) return status(401, { message: "Unauthorized." });
 
         return {
           user: session.user,
