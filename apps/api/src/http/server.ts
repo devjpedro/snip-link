@@ -2,6 +2,7 @@ import openapi from "@elysiajs/openapi";
 import { env } from "@snip-link/env";
 import { Elysia } from "elysia";
 import { betterAuthPlugin, OpenAPI } from "./plugins/better-auth";
+import { linksRoutes } from "./routes/links";
 
 const app = new Elysia()
   .use(betterAuthPlugin)
@@ -13,6 +14,7 @@ const app = new Elysia()
       },
     })
   )
+  .use(linksRoutes)
   .get("/", () => "hi")
   .listen(env.PORT);
 
