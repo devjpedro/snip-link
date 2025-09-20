@@ -1,0 +1,4 @@
+{
+  "extends": "@snip-link/tsconfig/base.json",
+  "include": ["index.ts"]
+}

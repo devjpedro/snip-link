@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: bitnami/postgresql:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRESQL_USERNAME=docker
+      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_DB=snip-link
+    volumes:
+      - postgres_data:/bitnami/snip-link
+
+volumes:
+  postgres_data:

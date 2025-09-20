@@ -1,6 +1,7 @@
+import { env } from "@snip-link/env";
 import { Elysia } from "elysia";
 
-const PORT = 3333;
+const PORT = env.PORT;
 
 const app = new Elysia().get("/", () => "hi").listen(PORT);
 
