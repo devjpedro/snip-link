@@ -303,7 +303,6 @@ export const createLink = new Elysia().use(betterAuthPlugin).post(
     detail: {
       summary: "Criar novo link encurtado",
       description: "Cria um novo link encurtado com alias opcional",
-      tags: ["links"],
     },
   }
 );
