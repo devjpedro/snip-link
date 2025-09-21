@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny lint/suspicious/noAssignInExpressions lint/style/noMagicNumbers: <Necessary> */
 
 import Elysia from "elysia";
+import { HTTP_STATUS } from "../constants/httpStatus";
 import { auth } from "../lib/auth";
 
 let _schema: ReturnType<typeof auth.api.generateOpenAPISchema>;
@@ -15,7 +16,11 @@ export const betterAuthPlugin = new Elysia({ name: "better-auth" })
           headers,
         });
 
-        if (!session) return status(401, { message: "Unauthorized." });
+        if (!session)
+          return status(HTTP_STATUS.UNAUTHORIZED, {
+            success: false,
+            error: "Não autorizado",
+          });
 
         return {
           user: session.user,
