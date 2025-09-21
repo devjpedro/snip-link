@@ -250,6 +250,14 @@ export const updateLink = new Elysia().use(betterAuthPlugin).put(
     try {
       const { id } = params;
 
+      if (!id || id.trim() === "" || id === "{id}") {
+        set.status = HTTP_STATUS.BAD_REQUEST;
+        return {
+          success: false,
+          error: "ID do link é obrigatório.",
+        };
+      }
+
       // Verificar se o link existe e pertence ao usuário
       const existingLink = await checkLinkOwnership(id, user.id);
 
@@ -405,7 +413,7 @@ export const updateLink = new Elysia().use(betterAuthPlugin).put(
       }),
     },
     detail: {
-      summary: "Atualizar link encurtado",
+      summary: "Atualizar link",
       description:
         "Atualiza um link encurtado existente (URL, alias personalizado ou status)",
       tags: ["links"],

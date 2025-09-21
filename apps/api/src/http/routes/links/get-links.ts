@@ -72,7 +72,7 @@ export const getLinks = new Elysia().use(betterAuthPlugin).get(
       pageIndex: t.Numeric({ minimum: 0, default: 0 }),
     }),
     detail: {
-      summary: "Obter links do usuário",
+      summary: "Obter todos os links do usuário",
       description:
         "Retornar uma lista paginada de links do usuário autenticado.",
     },

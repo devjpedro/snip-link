@@ -1,11 +1,13 @@
+import { eq } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { db } from "@/db/client";
+import { links } from "@/db/schema/links";
 import { HTTP_STATUS } from "@/http/constants/httpStatus";
 import { betterAuthPlugin } from "@/http/plugins/better-auth";
 
-export const getLinkDetail = new Elysia().use(betterAuthPlugin).get(
-  ":id",
-  async ({ params, set, user }) => {
+export const deleteLink = new Elysia().use(betterAuthPlugin).delete(
+  "/:id",
+  async ({ params, user, set }) => {
     const { id: linkId } = params;
 
     if (!linkId || linkId.trim() === "" || linkId === "{id}") {
@@ -17,8 +19,8 @@ export const getLinkDetail = new Elysia().use(betterAuthPlugin).get(
     }
 
     const link = await db.query.links.findFirst({
-      where(fields, { eq }) {
-        return eq(fields.id, linkId);
+      where(fields, { eq: eqOp }) {
+        return eqOp(fields.id, linkId);
       },
     });
 
@@ -39,10 +41,13 @@ export const getLinkDetail = new Elysia().use(betterAuthPlugin).get(
       };
     }
 
+    await db.delete(links).where(eq(links.id, linkId));
+
     set.status = HTTP_STATUS.OK;
+
     return {
       success: true,
-      data: link,
+      message: "Link excluído com sucesso.",
     };
   },
   {
@@ -55,9 +60,9 @@ export const getLinkDetail = new Elysia().use(betterAuthPlugin).get(
       }),
     }),
     detail: {
-      summary: "Obter detalhes do link",
+      summary: "Deletar um link",
       description:
-        "Recupera as informações de um link encurtado específico usando seu ID único.",
+        "Deleta um link encurtado específico usando seu ID único. Apenas o proprietário do link pode deletá-lo.",
     },
   }
 );

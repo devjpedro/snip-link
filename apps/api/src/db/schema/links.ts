@@ -1,6 +1,7 @@
 import { randomUUIDv7 } from "bun";
 import {
   boolean,
+  index,
   integer,
   pgTable,
   text,
@@ -31,7 +32,7 @@ export const links = pgTable(
   },
   (table) => [
     uniqueIndex("links_short_id_idx").on(table.shortId),
-    uniqueIndex("links_user_id_idx").on(table.userId),
+    index("links_user_id_idx").on(table.userId),
     uniqueIndex("links_custom_alias_user_idx").on(
       table.customAlias,
       table.userId
