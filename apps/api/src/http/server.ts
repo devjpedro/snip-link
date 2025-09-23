@@ -1,12 +1,12 @@
 import openapi from "@elysiajs/openapi";
 import { env } from "@snip-link/env";
 import { Elysia } from "elysia";
-import { betterAuthPlugin, OpenAPI } from "./plugins/better-auth";
+import { OpenAPI } from "./plugins/better-auth";
+import { analyticsRoutes } from "./routes/analytics";
 import { linksRoutes } from "./routes/links";
 import { redirectToUrl } from "./routes/redirect-to-url";
 
 const app = new Elysia()
-  .use(betterAuthPlugin)
   .use(
     openapi({
       documentation: {
@@ -17,7 +17,8 @@ const app = new Elysia()
   )
   .use(linksRoutes)
   .use(redirectToUrl)
-  .get("/", () => "hi")
+  .use(analyticsRoutes)
+  .get("/health", () => "OK")
   .listen(env.PORT);
 
 // biome-ignore lint/suspicious/noConsole: <Necessary for logging>
