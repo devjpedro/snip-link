@@ -1,5 +1,5 @@
 import { Footer } from "@/components/footer";
-import { Header } from "@/components/header";
+import { RedirectToTop } from "@/components/redirect-to-top";
 import { CTASection } from "./sections/cta";
 import { FeaturesSection } from "./sections/features-section";
 import { HeroSection } from "./sections/hero";
@@ -8,7 +8,6 @@ import { StatsSection } from "./sections/stats";
 export default function Page() {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <main>
         <HeroSection />
         <StatsSection />
@@ -16,6 +15,7 @@ export default function Page() {
         <CTASection />
       </main>
       <Footer />
+      <RedirectToTop />
     </div>
   );
 }

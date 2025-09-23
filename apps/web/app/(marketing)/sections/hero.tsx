@@ -42,7 +42,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-background">
+    <section className="relative overflow-hidden bg-background" id="hero">
       <div className="grid-pattern absolute inset-0 opacity-50" />
 
       <div className="container relative mx-auto px-4 py-24">

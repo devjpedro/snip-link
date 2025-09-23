@@ -38,10 +38,10 @@ export function Header() {
           {navItems.map((item) => (
             <Link
               className={cn(
-                "transition-colors hover:text-foreground",
+                "transition-colors",
                 pathName === item.href
                   ? "font-medium text-primary hover:text-primary/80"
-                  : "text-muted-foreground"
+                  : "text-muted-foreground hover:text-foreground/70"
               )}
               href={item.href}
               key={item.href}
