@@ -1,18 +1,12 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ThemeProvider as NextThemesProvider } from "next-themes"
+import { ThemeProvider } from "@snip-link/ui/components/theme-provider";
+import type * as React from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <NextThemesProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-      enableColorScheme
-    >
+    <ThemeProvider attribute="class" defaultTheme="system" enableColorScheme>
       {children}
-    </NextThemesProvider>
-  )
+    </ThemeProvider>
+  );
 }
