@@ -1,5 +1,8 @@
 import { Header } from "@/components/header";
+import { CTASection } from "./sections/cta";
+import { FeaturesSection } from "./sections/features-section";
 import { HeroSection } from "./sections/hero";
+import { StatsSection } from "./sections/stats";
 
 export default function Page() {
   return (
@@ -7,9 +10,9 @@ export default function Page() {
       <Header />
       <main>
         <HeroSection />
-        {/* <StatsSection /> */}
-        {/* <FeaturesSection /> */}
-        {/* <CTASection /> */}
+        <StatsSection />
+        <FeaturesSection />
+        <CTASection />
       </main>
       {/* <Footer /> */}
     </div>
