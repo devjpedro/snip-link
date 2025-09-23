@@ -1,3 +1,4 @@
+import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { CTASection } from "./sections/cta";
 import { FeaturesSection } from "./sections/features-section";
@@ -14,7 +15,7 @@ export default function Page() {
         <FeaturesSection />
         <CTASection />
       </main>
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 }

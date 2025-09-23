@@ -5,6 +5,7 @@ import { Card, CardContent } from "@snip-link/ui/components/card";
 import { Input } from "@snip-link/ui/components/input";
 import { BarChart3, Check, Copy, LinkIcon, Shield, Zap } from "lucide-react";
 import { useState } from "react";
+import { branding } from "@/app/constants/branding";
 import { DELAY, LONG_DELAY } from "@/app/constants/delay";
 
 const SHORT_URL_BASE = "snip.link/s";
@@ -57,8 +58,7 @@ export function HeroSection() {
               <span className="gradient-text block">feito para developers</span>
             </h1>
             <p className="mx-auto max-w-2xl text-balance text-muted-foreground text-xl">
-              Transforme URLs longas em links curtos e elegantes. Com analytics
-              detalhados e sem limites de uso.
+              {branding.description}
             </p>
           </div>
 

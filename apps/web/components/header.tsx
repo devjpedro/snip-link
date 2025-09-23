@@ -11,6 +11,7 @@ import { cn } from "@snip-link/ui/lib/utils";
 import { LinkIcon, Menu, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { branding } from "@/app/constants/branding";
 
 const navItems = [
   { label: "Início", href: "/" },
@@ -28,7 +29,9 @@ export function Header() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <LinkIcon className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="gradient-text font-bold text-xl">snip.link</span>
+          <span className="gradient-text font-bold text-xl">
+            {branding.name}
+          </span>
         </Link>
 
         <nav className="hidden items-center space-x-6 lg:flex">
@@ -59,7 +62,7 @@ export function Header() {
               </Link>
             </Button>
             <Button asChild size="sm">
-              <Link href="/signup">Criar Conta</Link>
+              <Link href="/sign-up">Criar Conta</Link>
             </Button>
           </div>
 
@@ -103,7 +106,7 @@ export function Header() {
                     </Link>
                   </Button>
                   <Button asChild className="w-full" size="sm">
-                    <Link href="/signup">Criar Conta</Link>
+                    <Link href="/sign-up">Criar Conta</Link>
                   </Button>
                 </div>
               </nav>

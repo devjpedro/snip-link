@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@snip-link/ui/components/card";
 import { useEffect, useState } from "react";
+import { branding } from "@/app/constants/branding";
 
 const stats = [
   { label: "Links Encurtados", value: 50_000, suffix: "+" },
@@ -71,7 +72,7 @@ export function StatsSection() {
           <p className="mx-auto max-w-2xl text-muted-foreground">
             Junte-se à comunidade que já escolheu o{" "}
             <span className="rounded bg-primary/10 px-1 font-mono text-base">
-              snip.link
+              {branding.name}
             </span>{" "}
             para seus projetos
           </p>

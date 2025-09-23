@@ -1,6 +1,7 @@
 import { Button } from "@snip-link/ui/components/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { branding } from "@/app/constants/branding";
 
 export function CTASection() {
   return (
@@ -20,14 +21,14 @@ export function CTASection() {
           <p className="text-balance text-muted-foreground text-xl">
             Junte-se a milhares de desenvolvedores que já escolheram o{" "}
             <span className="rounded bg-primary/10 px-1 font-mono text-base">
-              snip.link
+              {branding.name}
             </span>
             . É gratuito, rápido e sem complicações.
           </p>
 
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Button asChild className="px-8 text-base" size="lg">
-              <Link href="/signup">
+              <Link href="/sign-up">
                 Criar Conta Gratuita
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
