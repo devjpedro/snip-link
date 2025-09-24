@@ -59,6 +59,8 @@ export function Footer() {
                 <Link
                   className="text-muted-foreground transition-colors hover:text-foreground"
                   href="http://localhost:3333/openapi"
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   Documentação
                 </Link>
@@ -67,6 +69,8 @@ export function Footer() {
                 <Link
                   className="text-muted-foreground transition-colors hover:text-foreground"
                   href="http://localhost:3333/openapi"
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   API
                 </Link>
@@ -75,6 +79,8 @@ export function Footer() {
                 <Link
                   className="text-muted-foreground transition-colors hover:text-foreground"
                   href="http://localhost:3333/openapi"
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   Ajuda
                 </Link>
