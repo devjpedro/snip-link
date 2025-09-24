@@ -58,7 +58,7 @@ export function Footer() {
               <li>
                 <Link
                   className="text-muted-foreground transition-colors hover:text-foreground"
-                  href="/docs"
+                  href="http://localhost:3333/openapi"
                 >
                   Documentação
                 </Link>
@@ -66,7 +66,7 @@ export function Footer() {
               <li>
                 <Link
                   className="text-muted-foreground transition-colors hover:text-foreground"
-                  href="/api"
+                  href="http://localhost:3333/openapi"
                 >
                   API
                 </Link>
@@ -74,7 +74,7 @@ export function Footer() {
               <li>
                 <Link
                   className="text-muted-foreground transition-colors hover:text-foreground"
-                  href="/help"
+                  href="http://localhost:3333/openapi"
                 >
                   Ajuda
                 </Link>
