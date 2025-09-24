@@ -25,6 +25,9 @@
     "packages/*"
   ],
   "dependencies": {
-    "@elysiajs/openapi": "^1.4.6"
+    "@elysiajs/openapi": "^1.4.6",
+    "@hookform/resolvers": "^5.2.2",
+    "react-hook-form": "^7.63.0",
+    "zod": "^4.1.11"
   }
 }
