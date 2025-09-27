@@ -11,6 +11,7 @@ const envSchema = z.object({
   BETTER_AUTH_SECRET: z.string().min(1),
   BETTER_AUTH_URL: z.url(),
   DATABASE_URL: z.string().min(1).startsWith("postgresql://"),
+  NEXT_PUBLIC_BASE_URL: z.url().min(1),
 });
 
 export const env = envSchema.parse(process.env);

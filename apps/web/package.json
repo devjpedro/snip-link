@@ -13,8 +13,9 @@
   },
   "dependencies": {
     "@snip-link/api": "workspace:*",
-    "@snip-link/ui": "workspace:*",
     "@snip-link/env": "workspace:*",
+    "@snip-link/ui": "workspace:*",
+    "better-auth": "^1.3.18",
     "lucide-react": "^0.475.0",
     "next": "^15.4.5",
     "next-themes": "^0.4.6",

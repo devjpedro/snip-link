@@ -1,14 +1,16 @@
+import { env } from "@snip-link/env";
 import bcrypt from "bcrypt";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
-import { db } from "@/db/client";
+import { db } from "../../db/client";
 
 const MAX_AGE = 7; // 7 days
 const MAX_AGE_CACHE = 5; // 5 minutes
 
 export const auth = betterAuth({
   basePath: "/auth",
+  trustedOrigins: [env.NEXT_PUBLIC_BASE_URL],
   plugins: [openAPI()],
   database: drizzleAdapter(db, {
     provider: "pg",

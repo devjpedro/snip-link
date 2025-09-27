@@ -1,7 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@snip-link/ui/components/alert";
 import { Button } from "@snip-link/ui/components/button";
+
 import {
   Form,
   FormControl,
@@ -12,11 +18,11 @@ import {
 } from "@snip-link/ui/components/form";
 import { Input } from "@snip-link/ui/components/input";
 import { Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { LONG_DELAY } from "@/app/constants/delay";
+import { authClient } from "@/lib/auth-client";
+import { translateError } from "@/utils/translate-error";
 
 const formSchema = z.object({
   email: z.email("E-mail inválido").min(1, "E-mail é obrigatório"),
@@ -27,8 +33,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-
-  const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -44,17 +49,34 @@ export function LoginForm() {
   } = form;
 
   const handleFormSubmit = async (data: FormData) => {
-    // biome-ignore lint/suspicious/noConsole: <Necessary>
-    console.log({ data });
+    const { email, password } = data;
 
-    await new Promise((resolve) => setTimeout(resolve, LONG_DELAY));
+    const result = await authClient.signIn.email({
+      email,
+      password,
+      callbackURL: "/dashboard",
+      rememberMe: true,
+    });
 
-    router.push("/dashboard");
+    if (result.error) {
+      setErrorMessage(translateError(result.error.code));
+      return;
+    }
+
+    setErrorMessage("");
+    form.reset();
   };
 
   return (
     <Form {...form}>
       <form className="space-y-4" onSubmit={handleSubmit(handleFormSubmit)}>
+        {errorMessage && (
+          <Alert variant="destructive">
+            <AlertTitle>Erro ao fazer login</AlertTitle>
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        )}
+
         <FormField
           control={form.control}
           name="email"

@@ -9,6 +9,7 @@
     "db:studio": "bunx --bun drizzle-kit studio"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.4.0",
     "@elysiajs/openapi": "^1.4.6",
     "@snip-link/env": "workspace:*",
     "bcrypt": "^6.0.0",

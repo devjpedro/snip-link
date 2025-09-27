@@ -5,7 +5,7 @@ import type * as React from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableColorScheme>
+    <ThemeProvider attribute="class" defaultTheme="light" enableColorScheme>
       {children}
     </ThemeProvider>
   );
