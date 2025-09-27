@@ -3,9 +3,7 @@ import Elysia from "elysia";
 import { db } from "@/db/client";
 import { links } from "@/db/schema/links";
 import { HTTP_STATUS } from "@/http/constants/http-status";
-import { betterAuthPlugin } from "@/http/plugins/better-auth";
 import { linkBodySchema, linkResponseSchema } from "@/http/schemas/create-link";
-import { checkIfUrlAlreadyExists } from "@/http/utils/check-exists";
 import { validateUrlInput } from "@/http/utils/check-valid-url";
 import { generateUniqueShortId } from "@/http/utils/generate-short-id";
 import { processCustomAlias } from "@/http/utils/process-custom-alias";
@@ -55,9 +53,9 @@ export const buildSuccessResponse = (
   };
 };
 
-export const createPrivateLink = new Elysia().use(betterAuthPlugin).post(
-  "/",
-  async ({ body, set, user }) => {
+export const createPublicLink = new Elysia().post(
+  "/public",
+  async ({ body, set }) => {
     try {
       const { originalUrl, customAlias } = body;
 
@@ -70,29 +68,10 @@ export const createPrivateLink = new Elysia().use(betterAuthPlugin).post(
         };
       }
 
-      const existingUrlLink = await checkIfUrlAlreadyExists(
-        originalUrl,
-        user.id
-      );
-      if (existingUrlLink) {
-        set.status = HTTP_STATUS.CONFLICT;
-        return {
-          success: false,
-          error: "Você já possui um link encurtado para esta URL.",
-          data: {
-            existingLink: {
-              shortId: existingUrlLink.shortId,
-              customAlias: existingUrlLink.customAlias,
-              shortUrl: buildShortUrl(existingUrlLink.shortId),
-            },
-          },
-        };
-      }
-
       let shortId: string;
 
       if (customAlias) {
-        const aliasResult = await processCustomAlias(customAlias, user.id);
+        const aliasResult = await processCustomAlias(customAlias);
         if (!aliasResult.success) {
           set.status = HTTP_STATUS.CONFLICT;
           return {
@@ -126,9 +105,9 @@ export const createPrivateLink = new Elysia().use(betterAuthPlugin).post(
       const newLink = await createLinkInDatabase(
         shortId,
         originalUrl,
-        customAlias,
-        user.id
+        customAlias
       );
+
       if (!newLink) {
         set.status = HTTP_STATUS.INTERNAL_SERVER_ERROR;
         return {
@@ -138,7 +117,7 @@ export const createPrivateLink = new Elysia().use(betterAuthPlugin).post(
       }
 
       set.status = HTTP_STATUS.CREATED;
-      return buildSuccessResponse(newLink, false);
+      return buildSuccessResponse(newLink, true);
     } catch (error) {
       set.status = HTTP_STATUS.INTERNAL_SERVER_ERROR;
       return {
@@ -149,12 +128,11 @@ export const createPrivateLink = new Elysia().use(betterAuthPlugin).post(
     }
   },
   {
-    auth: true,
     body: linkBodySchema,
     response: linkResponseSchema,
     detail: {
-      summary: "Criar novo link (autenticado)",
-      description: "Cria um novo link encurtado para usuários logados",
+      summary: "Criar novo link público",
+      description: "Cria um novo link encurtado para usuários não logados",
     },
   }
 );
