@@ -1,7 +1,7 @@
+import bcrypt from "bcrypt";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
-import Bun from "bun";
 import { db } from "@/db/client";
 
 const MAX_AGE = 7; // 7 days
@@ -24,8 +24,8 @@ export const auth = betterAuth({
     autoSignIn: true,
     requireEmailVerification: false,
     password: {
-      hash: (password: string) => Bun.password.hash(password),
-      verify: ({ password, hash }) => Bun.password.verify(password, hash),
+      hash: (password: string) => bcrypt.hash(password, 10),
+      verify: async ({ password, hash }) => bcrypt.compare(password, hash),
     },
   },
   session: {

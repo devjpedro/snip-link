@@ -1,5 +1,5 @@
-import { randomUUIDv7 } from "bun";
 import { index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { v7 as uuidv7 } from "uuid";
 import { links } from "./links";
 
 export const clicks = pgTable(
@@ -7,7 +7,7 @@ export const clicks = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => randomUUIDv7()),
+      .$defaultFn(() => uuidv7()),
     linkId: text("link_id")
       .notNull()
       .references(() => links.id, { onDelete: "cascade" }),

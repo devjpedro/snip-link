@@ -1,17 +1,23 @@
 import openapi from "@elysiajs/openapi";
 import { env } from "@snip-link/env";
 import { Elysia } from "elysia";
-import { OpenAPI } from "./plugins/better-auth";
+import { betterAuthPlugin, OpenAPI } from "./plugins/better-auth";
 import { analyticsRoutes } from "./routes/analytics";
 import { linksRoutes } from "./routes/links";
 import { redirectToUrl } from "./routes/redirect-to-url";
 
 const app = new Elysia()
+  .use(betterAuthPlugin)
   .use(
     openapi({
       documentation: {
         components: await OpenAPI.components,
         paths: await OpenAPI.getPaths(),
+        info: {
+          title: "SnipLink API",
+          version: "1.0.0",
+          description: "Documentação oficial da API do SnipLink",
+        },
       },
     })
   )

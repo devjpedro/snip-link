@@ -1,4 +1,3 @@
-import { randomUUIDv7 } from "bun";
 import {
   boolean,
   index,
@@ -8,6 +7,7 @@ import {
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
+import { v7 as uuidv7 } from "uuid";
 import { users } from "./users";
 
 export const links = pgTable(
@@ -15,7 +15,7 @@ export const links = pgTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => randomUUIDv7()),
+      .$defaultFn(() => uuidv7()),
     shortId: text("short_id").notNull().unique(),
     originalUrl: text("original_url").notNull(),
     customAlias: text("custom_alias"),
