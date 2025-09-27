@@ -6,7 +6,6 @@ import { openAPI } from "better-auth/plugins";
 import { db } from "../../db/client";
 
 const MAX_AGE = 7; // 7 days
-const MAX_AGE_CACHE = 5; // 5 minutes
 
 export const auth = betterAuth({
   basePath: "/auth",
@@ -31,10 +30,10 @@ export const auth = betterAuth({
     },
   },
   session: {
-    expiresIn: 60 * 60 * 24 * MAX_AGE, // 7 days
+    expiresIn: 60 * 60 * 24 * MAX_AGE,
     cookieCache: {
       enabled: true,
-      maxAge: 60 * MAX_AGE_CACHE, // 5 minutes
+      maxAge: 60 * 60 * 24 * MAX_AGE,
     },
   },
 });
