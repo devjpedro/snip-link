@@ -8,10 +8,13 @@ import {
   SheetTrigger,
 } from "@snip-link/ui/components/sheet";
 import { cn } from "@snip-link/ui/lib/utils";
+import type { User as UserType } from "better-auth";
 import { LinkIcon, Menu, User } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { branding } from "@/app/constants/branding";
+import { signOut } from "@/lib/auth-client";
 
 const navItems = [
   { label: "Início", href: "/" },
@@ -19,8 +22,31 @@ const navItems = [
   { label: "Analytics", href: "/analytics" },
 ];
 
-export function Header() {
+type HeaderProps = {
+  user: UserType | null;
+};
+
+export function Header({ user }: HeaderProps) {
+  const [isPending, setIsPending] = useState(false);
+
   const pathName = usePathname();
+  const router = useRouter();
+
+  const handleClickLogout = async () => {
+    await signOut({
+      fetchOptions: {
+        onRequest: () => {
+          setIsPending(true);
+        },
+        onResponse: () => {
+          setIsPending(false);
+        },
+        onSuccess: () => {
+          router.refresh();
+        },
+      },
+    });
+  };
 
   return (
     <header className="sticky top-0 z-50 border-border border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -34,36 +60,53 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="hidden items-center space-x-6 lg:flex">
-          {navItems.map((item) => (
-            <Link
-              className={cn(
-                "transition-colors",
-                pathName === item.href
-                  ? "font-medium text-primary hover:text-primary/80"
-                  : "text-muted-foreground hover:text-foreground/70"
-              )}
-              href={item.href}
-              key={item.href}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        {!!user && (
+          <nav className="hidden items-center space-x-6 lg:flex">
+            {navItems.map((item) => {
+              return (
+                <Link
+                  className={cn(
+                    "transition-colors",
+                    pathName === item.href
+                      ? "font-medium text-primary hover:text-primary/80"
+                      : "text-muted-foreground hover:text-foreground/70"
+                  )}
+                  href={item.href}
+                  key={item.href}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
 
         <div className="flex items-center space-x-3">
           <AnimatedThemeToggler />
 
           <div className="hidden items-center space-x-3 sm:flex">
-            <Button asChild size="sm" variant="ghost">
-              <Link href="/login">
-                <User className="mr-2 h-4 w-4" />
-                Entrar
-              </Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href="/sign-up">Criar Conta</Link>
-            </Button>
+            {!user && (
+              <>
+                <Button asChild size="sm" variant="ghost">
+                  <Link href="/login">
+                    <User className="mr-2 h-4 w-4" />
+                    Entrar
+                  </Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/sign-up">Criar Conta</Link>
+                </Button>
+              </>
+            )}
+            {!!user && (
+              <Button
+                disabled={isPending}
+                onClick={handleClickLogout}
+                size="sm"
+              >
+                Sair
+              </Button>
+            )}
           </div>
 
           <Sheet>

@@ -1,6 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "@snip-link/ui/globals.css";
+import { auth } from "@snip-link/api/auth";
+import { headers } from "next/headers";
 import { Header } from "@/components/header";
 import { Providers } from "@/components/providers";
 
@@ -14,11 +16,15 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
   return (
     <html lang="pt" suppressHydrationWarning>
       <body
@@ -26,7 +32,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
-          <Header />
+          <Header user={session?.user ?? null} />
           {children}
         </Providers>
       </body>

@@ -3,7 +3,7 @@ import Elysia, { t } from "elysia";
 import { db } from "@/db/client";
 import { clicks } from "@/db/schema/clicks";
 import { links } from "@/db/schema/links";
-import { HTTP_STATUS } from "../constants/httpStatus";
+import { HTTP_STATUS } from "../constants/http-status";
 
 export const redirectToUrl = new Elysia().get(
   "/:shortId",

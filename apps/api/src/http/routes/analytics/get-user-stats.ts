@@ -3,7 +3,7 @@ import Elysia, { t } from "elysia";
 import { db } from "@/db/client";
 import { clicks } from "@/db/schema/clicks";
 import { links } from "@/db/schema/links";
-import { HTTP_STATUS } from "@/http/constants/httpStatus";
+import { HTTP_STATUS } from "@/http/constants/http-status";
 import { betterAuthPlugin } from "@/http/plugins/better-auth";
 
 type PeriodStats = {

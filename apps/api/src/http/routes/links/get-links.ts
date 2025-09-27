@@ -2,7 +2,7 @@ import { and, count, desc, eq, gte, lte } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { db } from "@/db/client";
 import { links } from "@/db/schema/links";
-import { HTTP_STATUS } from "@/http/constants/httpStatus";
+import { HTTP_STATUS } from "@/http/constants/http-status";
 import { betterAuthPlugin } from "@/http/plugins/better-auth";
 
 const statusEnum = t.Enum({ active: "active", inactive: "inactive" });

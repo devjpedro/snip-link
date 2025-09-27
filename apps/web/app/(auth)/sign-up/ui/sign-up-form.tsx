@@ -1,6 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@snip-link/ui/components/alert";
 import { Button } from "@snip-link/ui/components/button";
 import { Checkbox } from "@snip-link/ui/components/checkbox";
 import {
@@ -18,7 +23,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { LONG_DELAY } from "@/app/constants/delay";
+import { signUp } from "@/lib/auth-client";
+import { translateError } from "@/utils/translate-error";
 
 const MIN_PASSWORD_LENGTH = 6;
 
@@ -46,6 +52,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export const SignUpForm = () => {
   const [showPasswordSet, setShowPasswordSet] = useState(new Set<string>());
+  const [errorMessage, setErrorMessage] = useState("");
 
   const router = useRouter();
 
@@ -81,12 +88,22 @@ export const SignUpForm = () => {
   };
 
   const handleFormSubmit = async (data: FormData) => {
-    // biome-ignore lint/suspicious/noConsole: <Necessary>
-    console.log({ data });
+    const { name, email, password } = data;
 
-    await new Promise((resolve) => setTimeout(resolve, LONG_DELAY));
-
-    router.push("/dashboard");
+    await signUp.email({
+      email,
+      password,
+      name,
+      callbackURL: "/dashboard",
+      fetchOptions: {
+        onSuccess: () => {
+          router.refresh();
+        },
+        onError: ({ error }) => {
+          setErrorMessage(translateError(error?.code));
+        },
+      },
+    });
   };
 
   return (
@@ -95,6 +112,13 @@ export const SignUpForm = () => {
         className="space-y-6"
         onSubmit={form.handleSubmit(handleFormSubmit)}
       >
+        {errorMessage && (
+          <Alert variant="destructive">
+            <AlertTitle>Erro ao fazer login</AlertTitle>
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        )}
+
         <FormField
           control={form.control}
           name="name"

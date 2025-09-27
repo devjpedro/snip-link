@@ -2,7 +2,7 @@ import { and, count, eq, gte, lte, sql } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { db } from "@/db/client";
 import { clicks } from "@/db/schema/clicks";
-import { HTTP_STATUS } from "@/http/constants/httpStatus";
+import { HTTP_STATUS } from "@/http/constants/http-status";
 import { betterAuthPlugin } from "@/http/plugins/better-auth";
 
 const END_OF_DAY_HOURS = 23;

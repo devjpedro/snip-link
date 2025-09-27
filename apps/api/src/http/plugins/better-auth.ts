@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny lint/suspicious/noAssignInExpressions lint/style/noMagicNumbers: <Necessary> */
 
 import Elysia from "elysia";
-import { HTTP_STATUS } from "../constants/httpStatus";
+import { HTTP_STATUS } from "../constants/http-status";
 import { auth } from "../lib/auth";
 
 let _schema: ReturnType<typeof auth.api.generateOpenAPISchema>;

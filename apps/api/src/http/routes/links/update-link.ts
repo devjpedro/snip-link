@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { db } from "@/db/client";
 import { links } from "@/db/schema/links";
-import { HTTP_STATUS } from "@/http/constants/httpStatus";
+import { HTTP_STATUS } from "@/http/constants/http-status";
 import { betterAuthPlugin } from "@/http/plugins/better-auth";
 import { checkIsValidUrl } from "@/http/utils/check-valid-url";
 import { validateCustomAlias } from "@/http/utils/validate-custom-alias";

@@ -21,7 +21,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { authClient } from "@/lib/auth-client";
+import { signIn } from "@/lib/auth-client";
 import { translateError } from "@/utils/translate-error";
 
 const formSchema = z.object({
@@ -51,20 +51,20 @@ export function LoginForm() {
   const handleFormSubmit = async (data: FormData) => {
     const { email, password } = data;
 
-    const result = await authClient.signIn.email({
+    await signIn.email({
       email,
       password,
       callbackURL: "/dashboard",
       rememberMe: true,
+      fetchOptions: {
+        onError: ({ error }) => {
+          setErrorMessage(translateError(error?.code));
+        },
+        onSuccess: () => {
+          setErrorMessage("");
+        },
+      },
     });
-
-    if (result.error) {
-      setErrorMessage(translateError(result.error.code));
-      return;
-    }
-
-    setErrorMessage("");
-    form.reset();
   };
 
   return (
