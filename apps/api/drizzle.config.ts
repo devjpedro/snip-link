@@ -1,6 +1,6 @@
-import { env } from "@snip-link/env";
 import { defineConfig } from "drizzle-kit";
 import "./src/http/lib/compression-polyfill";
+import { env } from "@snip-link/env";
 
 export default defineConfig({
   schema: "./src/db/schema/**",

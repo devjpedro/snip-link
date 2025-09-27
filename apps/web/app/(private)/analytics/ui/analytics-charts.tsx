@@ -58,15 +58,15 @@ export const AnalyticsCharts = () => {
               <YAxis className="text-muted-foreground" fontSize={12} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
+                  backgroundColor: "var(--card)",
+                  border: "1px solid var(--border)",
                   borderRadius: "8px",
                 }}
               />
               <Line
                 dataKey="clicks"
-                dot={{ fill: "hsl(var(--primary))" }}
-                stroke="hsl(var(--primary))"
+                dot={{ fill: "var(--primary))" }}
+                stroke="var(--primary)"
                 strokeWidth={2}
                 type="monotone"
               />
@@ -91,14 +91,14 @@ export const AnalyticsCharts = () => {
               <YAxis className="text-muted-foreground" fontSize={12} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
+                  backgroundColor: "var(--card)",
+                  border: "1px solid var(--border)",
                   borderRadius: "8px",
                 }}
               />
               <Bar
                 dataKey="clicks"
-                fill="hsl(var(--primary))"
+                fill="var(--primary)"
                 radius={[BAR_TOP_RADIUS, BAR_TOP_RADIUS, 0, 0]}
               />
             </BarChart>
