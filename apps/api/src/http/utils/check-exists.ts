@@ -54,3 +54,26 @@ export const checkIfUrlAlreadyExists = async (
 
   return existing || null;
 };
+
+export const checkIfAnonymousUrlExists = async (
+  originalUrl: string
+): Promise<{
+  id: string;
+  shortId: string;
+  customAlias: string | null;
+  clickCount: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+} | null> => {
+  const existing = await db.query.links.findFirst({
+    where: (linksTable, { eq, and, isNull }) =>
+      and(
+        eq(linksTable.originalUrl, originalUrl),
+        isNull(linksTable.userId),
+        eq(linksTable.isActive, true)
+      ),
+  });
+
+  return existing || null;
+};

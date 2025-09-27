@@ -4,6 +4,7 @@ import { db } from "@/db/client";
 import { links } from "@/db/schema/links";
 import { HTTP_STATUS } from "@/http/constants/http-status";
 import { linkBodySchema, linkResponseSchema } from "@/http/schemas/create-link";
+import { checkIfAnonymousUrlExists } from "@/http/utils/check-exists";
 import { validateUrlInput } from "@/http/utils/check-valid-url";
 import { generateUniqueShortId } from "@/http/utils/generate-short-id";
 import { processCustomAlias } from "@/http/utils/process-custom-alias";
@@ -67,6 +68,30 @@ export const createPublicLink = new Elysia().post(
           error: urlValidation.error,
         };
       }
+
+      const existingAnonymousLink =
+        await checkIfAnonymousUrlExists(originalUrl);
+
+      if (existingAnonymousLink) {
+        set.status = HTTP_STATUS.OK;
+        return {
+          success: true,
+          message: "Link já existe. Retornando link existente.",
+          data: {
+            id: existingAnonymousLink.id,
+            shortId: existingAnonymousLink.shortId,
+            originalUrl,
+            customAlias: existingAnonymousLink.customAlias,
+            shortUrl: buildShortUrl(existingAnonymousLink.shortId),
+            clickCount: existingAnonymousLink.clickCount,
+            isActive: existingAnonymousLink.isActive,
+            createdAt: existingAnonymousLink.createdAt,
+            updatedAt: existingAnonymousLink.updatedAt,
+            isAnonymous: true,
+          },
+        };
+      }
+      // Se existe link anônimo MAS com alias diferente, continua para criar novo
 
       let shortId: string;
 

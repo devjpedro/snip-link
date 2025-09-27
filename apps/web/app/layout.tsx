@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import "@snip-link/ui/globals.css";
 import { auth } from "@snip-link/api/auth";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Header } from "@/components/header";
 import { Providers } from "@/components/providers";
@@ -15,6 +16,11 @@ const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 });
+
+export const metadata: Metadata = {
+  title: "snip.link",
+  description: "Um encurtador de URLs simples e eficiente.",
+};
 
 export default async function RootLayout({
   children,

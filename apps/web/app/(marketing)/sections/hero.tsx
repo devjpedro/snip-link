@@ -1,38 +1,53 @@
 "use client";
 
+import { env } from "@snip-link/env";
 import { Button } from "@snip-link/ui/components/button";
 import { Card, CardContent } from "@snip-link/ui/components/card";
 import { Input } from "@snip-link/ui/components/input";
+import type { User } from "better-auth";
 import { BarChart3, Check, Copy, LinkIcon, Shield, Zap } from "lucide-react";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { branding } from "@/app/constants/branding";
-import { DELAY, LONG_DELAY } from "@/app/constants/delay";
+import { LONG_DELAY } from "@/app/constants/delay";
+import { createLinkAction } from "../actions";
 
-const SHORT_URL_BASE = "snip.link/s";
-const RANDOM_ID_RADIX = 36;
-const RANDOM_ID_LENGTH = 6;
-
-export function HeroSection() {
+export function HeroSection({ user }: { user: User | null }) {
   const [url, setUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [copied, setCopied] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleShorten = async () => {
+  const [isPending, startTransition] = useTransition();
+
+  const handleShorten = () => {
     if (!url) return;
 
-    setIsLoading(true);
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, DELAY));
-      setShortUrl(
-        `${SHORT_URL_BASE}/${Math.random()
-          .toString(RANDOM_ID_RADIX)
-          .slice(2, 2 + RANDOM_ID_LENGTH)}`
-      );
-    } finally {
-      setIsLoading(false);
+    if (!(url.startsWith("http://") || url.startsWith("https://"))) {
+      toast.error("Por favor, insira uma URL válida.");
+      return;
     }
+
+    if (url.startsWith(env.NEXT_PUBLIC_API_URL)) {
+      toast.error("Não é possível encurtar uma URL do próprio serviço.");
+      setUrl("");
+      if (shortUrl) setShortUrl("");
+      return;
+    }
+
+    setShortUrl("");
+
+    startTransition(async () => {
+      const res = await createLinkAction(url, user?.id);
+
+      if (!res.success) {
+        toast.error(res.error || "Ocorreu um erro. Tente novamente.");
+        return;
+      }
+
+      if (res.success && res.data) setShortUrl(res.data.shortUrl);
+
+      setUrl("");
+    });
   };
 
   const handleCopy = async () => {
@@ -75,11 +90,11 @@ export function HeroSection() {
                   />
                   <Button
                     className="h-12 px-8"
-                    disabled={!url || isLoading}
+                    disabled={!url || isPending}
                     onClick={handleShorten}
                     size="lg"
                   >
-                    {isLoading ? (
+                    {isPending ? (
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                     ) : (
                       <>
