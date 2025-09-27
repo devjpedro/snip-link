@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "bun env:load next dev --turbopack",
-    "build": "next build",
+    "build": "bun run env:load next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
