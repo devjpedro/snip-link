@@ -24,5 +24,8 @@
     "drizzle-kit": "^0.31.4",
     "node-gyp": "^11.4.2"
   },
-  "module": "src/index.js"
+  "module": "src/index.js",
+  "exports": {
+    "./auth": "./src/http/lib/auth.ts"
+  }
 }

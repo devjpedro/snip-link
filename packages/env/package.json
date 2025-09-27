@@ -2,6 +2,10 @@
   "name": "@snip-link/env",
   "module": "index.ts",
   "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./client": "./client.ts"
+  },
   "devDependencies": {
     "@snip-link/tsconfig": "workspace:*"
   },
