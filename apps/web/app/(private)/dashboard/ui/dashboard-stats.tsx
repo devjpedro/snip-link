@@ -2,42 +2,51 @@
 
 import { MagicCard } from "@snip-link/ui/components/magic-card";
 import { BarChart3, Link2, MousePointer, TrendingUp } from "lucide-react";
+import type { MappedUserDashboardStats } from "@/utils/map-user-stats";
 
-const stats = [
-  {
-    title: "Total de Links",
-    value: "12",
-    change: "+2 este mês",
-    icon: Link2,
-    color: "text-primary",
-  },
-  {
-    title: "Total de Cliques",
-    value: "1,234",
-    change: "+15% vs mês anterior",
-    icon: MousePointer,
-    color: "text-green-500",
-  },
-  {
-    title: "Links Ativos",
-    value: "10",
-    change: "2 inativos",
-    icon: TrendingUp,
-    color: "text-primary",
-  },
-  {
-    title: "Taxa de Cliques",
-    value: "8.2%",
-    change: "+2.1% vs mês anterior",
-    icon: BarChart3,
-    color: "text-orange-500",
-  },
-];
+const mapDashboardCards = (statsData: MappedUserDashboardStats | null) => {
+  return [
+    {
+      title: "Total de Links",
+      value: (statsData?.totalLinks ?? 0).toString(),
+      change: `+${statsData?.newLinksThisMonth ?? 0} este mês`,
+      icon: Link2,
+      color: "text-primary",
+    },
+    {
+      title: "Total de Cliques",
+      value: (statsData?.totalClicks ?? 0).toLocaleString("pt-BR"),
+      change: `${(statsData?.clicksVsLastMonth ?? 0) > 0 ? "+" : ""}${statsData?.clicksVsLastMonth ?? 0}% vs mês anterior`,
+      icon: MousePointer,
+      color: "text-green-500",
+    },
+    {
+      title: "Links Ativos",
+      value: (statsData?.activeLinks ?? 0).toString(),
+      change: `${statsData?.inactiveLinks ?? 0} inativos`,
+      icon: TrendingUp,
+      color: "text-primary",
+    },
+    {
+      title: "Taxa de Cliques",
+      value: `${(statsData?.clickRate ?? 0).toFixed(1)}%`,
+      change: `${(statsData?.clickRateVsLastMonth ?? 0) > 0 ? "+" : ""}${statsData?.clickRateVsLastMonth ?? 0}% vs mês anterior`,
+      icon: BarChart3,
+      color: "text-orange-500",
+    },
+  ];
+};
 
-export const DashboardStats = () => {
+type DashboardStatsProps = {
+  stats: MappedUserDashboardStats | null;
+};
+
+export const DashboardStats = ({ stats }: DashboardStatsProps) => {
+  const cards = mapDashboardCards(stats);
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
-      {stats.map((stat, index) => (
+      {cards.map((stat, index) => (
         <MagicCard
           className="p-4 sm:p-6"
           key={`dashboard-stat-${stat.title}-${index}`}

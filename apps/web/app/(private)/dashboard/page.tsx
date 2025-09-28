@@ -11,11 +11,20 @@ import {
   TabsTrigger,
 } from "@snip-link/ui/components/tabs";
 import { Link2, Plus } from "lucide-react";
+import { getUserStats } from "@/app/http/get-user-stats";
+import { isApiSuccess } from "@/utils/api-guards";
+import { mapUserDashboardStats } from "@/utils/map-user-stats";
 import { CreateLinkForm } from "./ui/create-link-form";
 import { DashboardStats } from "./ui/dashboard-stats";
 import { LinksList } from "./ui/links-list";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const result = await getUserStats();
+
+  const stats = isApiSuccess(result)
+    ? mapUserDashboardStats(result.data)
+    : null;
+
   return (
     <main className="container mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <div className="space-y-6 sm:space-y-8">
@@ -28,7 +37,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <DashboardStats />
+        <DashboardStats stats={stats} />
 
         <Tabs className="space-y-4 sm:space-y-6" defaultValue="links">
           <TabsList className="mx-auto grid w-full max-w-md grid-cols-2 sm:mx-0">

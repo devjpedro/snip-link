@@ -23,7 +23,7 @@ export const createLink = async ({
   isPrivate = true,
 }: CreateLinkRequest & {
   isPrivate?: boolean;
-}) => {
+}): Promise<ApiResponse<CreateLinkResponse>> => {
   const endpointPath = isPrivate ? "links" : "links/public";
 
   try {

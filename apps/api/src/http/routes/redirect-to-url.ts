@@ -6,7 +6,7 @@ import { links } from "@/db/schema/links";
 import { HTTP_STATUS } from "../constants/http-status";
 
 export const redirectToUrl = new Elysia().get(
-  "/:shortId",
+  "/r/:shortId",
   async ({ params, set, redirect, request }) => {
     try {
       const { shortId } = params;

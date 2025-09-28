@@ -12,7 +12,7 @@ import { processCustomAlias } from "@/http/utils/process-custom-alias";
 import type { LinkType } from "@/types/links";
 
 export const buildShortUrl = (shortId: string) => {
-  return `${env.BETTER_AUTH_URL}/${shortId}`;
+  return `${env.BETTER_AUTH_URL}/r/${shortId}`;
 };
 
 export const createLinkInDatabase = async (
