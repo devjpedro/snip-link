@@ -6,12 +6,6 @@ import { links } from "@/db/schema/links";
 import { HTTP_STATUS } from "@/http/constants/http-status";
 import { betterAuthPlugin } from "@/http/plugins/better-auth";
 
-type PeriodStats = {
-  totalClicks: number;
-  totalLinks: number;
-  activeLinks: number;
-};
-
 type ClicksOverTime = {
   date: string;
   clicks: number;
@@ -25,159 +19,155 @@ type PopularLinks = {
   clicks: number;
 }[];
 
-const DAYS_IN_WEEK = 7;
 const DEFAULT_CHART_DAYS = 30;
 
-// obter data de início do período
-const getStartDate = (period: string): Date => {
+const getAllUserStats = async (userId: string, chartDays = 30) => {
   const now = new Date();
 
-  switch (period) {
-    case "today": {
-      const today = new Date(now);
-      today.setHours(0, 0, 0, 0);
-      return today;
-    }
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
 
-    case "week": {
-      const weekStart = new Date(now);
-      weekStart.setDate(now.getDate() - DAYS_IN_WEEK);
-      weekStart.setHours(0, 0, 0, 0);
-      return weekStart;
-    }
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
 
-    case "month": {
-      const monthStart = new Date(now);
-      monthStart.setMonth(now.getMonth() - 1);
-      monthStart.setHours(0, 0, 0, 0);
-      return monthStart;
-    }
+  const monthAgo = new Date(now);
+  monthAgo.setMonth(now.getMonth() - 1);
+  monthAgo.setHours(0, 0, 0, 0);
 
-    default:
-      return new Date("2000-01-01");
-  }
-};
+  const lastMonthStart = new Date(monthAgo);
+  lastMonthStart.setDate(1);
 
-// obter estatísticas de período específico
-const getPeriodStats = async (
-  userId: string,
-  period: string
-): Promise<PeriodStats> => {
-  const startDate = getStartDate(period);
+  const lastMonthEnd = new Date(now);
+  lastMonthEnd.setMonth(now.getMonth() - 1);
+  lastMonthEnd.setDate(0);
+  // biome-ignore lint/style/noMagicNumbers: <Necessary>
+  lastMonthEnd.setHours(23, 59, 59, 999);
 
-  const [totalClicksResult, totalLinksResult, activeLinksResult] =
-    await Promise.all([
-      // cliques no período
-      db
-        .select({ count: count() })
-        .from(clicks)
-        .innerJoin(links, eq(clicks.linkId, links.id))
-        .where(and(eq(links.userId, userId), gte(clicks.createdAt, startDate))),
+  const chartStartDate = new Date(now);
+  chartStartDate.setDate(now.getDate() - chartDays);
+  chartStartDate.setHours(0, 0, 0, 0);
 
-      // links criados no período
-      db
-        .select({ count: count() })
-        .from(links)
-        .where(and(eq(links.userId, userId), gte(links.createdAt, startDate))),
+  const mainStatsQuery = db
+    .select({
+      // Estatísticas gerais
+      totalLinks: count(links.id),
+      activeLinks: sum(
+        sql`CASE WHEN ${links.isActive} = true THEN 1 ELSE 0 END`
+      ),
+      totalClicks: sum(sql`COALESCE((
+        SELECT COUNT(*) FROM ${clicks} 
+        WHERE ${clicks.linkId} = ${links.id}
+      ), 0)`),
 
-      // links ativos criados no período
-      db
-        .select({ count: count() })
-        .from(links)
-        .where(
-          and(
-            eq(links.userId, userId),
-            eq(links.isActive, true),
-            gte(links.createdAt, startDate)
-          )
-        ),
-    ]);
+      // Estatísticas do período
+      todayClicks: sum(sql`COALESCE((
+        SELECT COUNT(*) FROM ${clicks} 
+        WHERE ${clicks.linkId} = ${links.id} 
+        AND ${clicks.createdAt} >= ${today.toISOString()}
+      ), 0)`),
 
-  return {
-    totalClicks: totalClicksResult[0]?.count || 0,
-    totalLinks: totalLinksResult[0]?.count || 0,
-    activeLinks: activeLinksResult[0]?.count || 0,
-  };
-};
+      yesterdayClicks: sum(sql`COALESCE((
+        SELECT COUNT(*) FROM ${clicks} 
+        WHERE ${clicks.linkId} = ${links.id} 
+        AND ${clicks.createdAt} >= ${yesterday.toISOString()}
+        AND ${clicks.createdAt} < ${today.toISOString()}
+      ), 0)`),
 
-// obter cliques ao longo do tempo
-const getClicksOverTime = async (
-  userId: string,
-  days = 30
-): Promise<ClicksOverTime> => {
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() - days);
-  startDate.setHours(0, 0, 0, 0);
+      thisMonthClicks: sum(sql`COALESCE((
+        SELECT COUNT(*) FROM ${clicks} 
+        WHERE ${clicks.linkId} = ${links.id} 
+        AND ${clicks.createdAt} >= ${monthAgo.toISOString()}
+      ), 0)`),
 
-  const clicksOverTime = await db
+      thisMonthLinks: sum(
+        sql`CASE WHEN ${links.createdAt} >= ${monthAgo.toISOString()} THEN 1 ELSE 0 END`
+      ),
+
+      lastMonthClicks: sum(sql`COALESCE((
+        SELECT COUNT(*) FROM ${clicks} 
+        WHERE ${clicks.linkId} = ${links.id} 
+        AND ${clicks.createdAt} >= ${lastMonthStart.toISOString()}
+        AND ${clicks.createdAt} <= ${lastMonthEnd.toISOString()}
+      ), 0)`),
+
+      lastMonthLinks: sum(sql`CASE 
+        WHEN ${links.createdAt} >= ${lastMonthStart.toISOString()} 
+        AND ${links.createdAt} <= ${lastMonthEnd.toISOString()} 
+        THEN 1 ELSE 0 END`),
+    })
+    .from(links)
+    .where(eq(links.userId, userId));
+
+  const clicksOverTimeQuery = db
     .select({
       date: sql<string>`DATE(${clicks.createdAt})`.as("date"),
       clicks: count(),
     })
     .from(clicks)
     .innerJoin(links, eq(clicks.linkId, links.id))
-    .where(and(eq(links.userId, userId), gte(clicks.createdAt, startDate)))
+    .where(and(eq(links.userId, userId), gte(clicks.createdAt, chartStartDate)))
     .groupBy(sql`DATE(${clicks.createdAt})`)
     .orderBy(sql`DATE(${clicks.createdAt})`);
 
-  return clicksOverTime as ClicksOverTime;
-};
-
-// obter links mais populares
-const getPopularLinks = async (
-  userId: string,
-  limit = 10
-): Promise<PopularLinks> => {
-  const popularLinks = await db
+  const popularLinksQuery = db
     .select({
       id: links.id,
       shortId: links.shortId,
       originalUrl: links.originalUrl,
       customAlias: links.customAlias,
-      clicks: sql<number>`COALESCE(${sum(sql`1`)}, 0)`.as("clicks"),
+      clicks: sql<number>`COALESCE(COUNT(${clicks.id}), 0)`.as("clicks"),
     })
     .from(links)
     .leftJoin(clicks, eq(clicks.linkId, links.id))
     .where(and(eq(links.userId, userId), eq(links.isActive, true)))
     .groupBy(links.id, links.shortId, links.originalUrl, links.customAlias)
     .orderBy(desc(sql`COALESCE(COUNT(${clicks.id}), 0)`))
-    .limit(limit);
+    .limit(10);
 
-  return popularLinks.map((link) => ({
-    ...link,
-    clicks: Number(link.clicks) || 0,
-  })) as PopularLinks;
-};
-
-// obter estatísticas gerais
-const getOverallStats = async (userId: string) => {
-  const [totalLinksResult, activeLinksResult, totalClicksResult] =
-    await Promise.all([
-      // ttal de links
-      db
-        .select({ count: count() })
-        .from(links)
-        .where(eq(links.userId, userId)),
-
-      // links ativos
-      db
-        .select({ count: count() })
-        .from(links)
-        .where(and(eq(links.userId, userId), eq(links.isActive, true))),
-
-      // total de cliques
-      db
-        .select({ count: count() })
-        .from(clicks)
-        .innerJoin(links, eq(clicks.linkId, links.id))
-        .where(eq(links.userId, userId)),
-    ]);
+  const [mainStats, clicksOverTime, popularLinks] = await Promise.all([
+    mainStatsQuery,
+    clicksOverTimeQuery,
+    popularLinksQuery,
+  ]);
 
   return {
-    totalLinks: totalLinksResult[0]?.count || 0,
-    activeLinks: activeLinksResult[0]?.count || 0,
-    totalClicks: totalClicksResult[0]?.count || 0,
+    mainStats: mainStats[0] || {
+      totalLinks: 0,
+      activeLinks: 0,
+      totalClicks: 0,
+      todayClicks: 0,
+      yesterdayClicks: 0,
+      thisMonthClicks: 0,
+      thisMonthLinks: 0,
+      lastMonthClicks: 0,
+      lastMonthLinks: 0,
+    },
+    clicksOverTime: clicksOverTime as ClicksOverTime,
+    popularLinks: popularLinks.map((link) => ({
+      ...link,
+      clicks: Number(link.clicks) || 0,
+    })) as PopularLinks,
   };
+};
+
+const PERCENT = 100;
+
+const calculateGrowthPercentage = (
+  current: number,
+  previous: number
+): number => {
+  if (previous === 0) return current > 0 ? PERCENT : 0;
+  return (
+    Math.round(((current - previous) / previous) * PERCENT * PERCENT) / PERCENT
+  );
+};
+
+const calculateClickRate = (
+  totalClicks: number,
+  totalLinks: number
+): number => {
+  if (totalLinks === 0) return 0;
+  return Math.round((totalClicks / totalLinks) * PERCENT * PERCENT) / PERCENT;
 };
 
 export const getUserStats = new Elysia().use(betterAuthPlugin).get(
@@ -192,47 +182,86 @@ export const getUserStats = new Elysia().use(betterAuthPlugin).get(
     }
 
     try {
-      const [
-        overallStats,
-        todayStats,
-        weekStats,
-        monthStats,
-        clicksOverTime,
-        popularLinks,
-      ] = await Promise.all([
-        getOverallStats(user.id),
-        getPeriodStats(user.id, "today"),
-        getPeriodStats(user.id, "week"),
-        getPeriodStats(user.id, "month"),
-        getClicksOverTime(user.id, Number(query.days) || DEFAULT_CHART_DAYS),
-        getPopularLinks(user.id, Number(query.limit) || 10),
-      ]);
+      // Uma única função que otimiza as consultas
+      const { mainStats, clicksOverTime, popularLinks } = await getAllUserStats(
+        user.id,
+        Number(query.days) || DEFAULT_CHART_DAYS
+      );
+
+      // Cálculos simples em memória
+      const totalLinksNum = Number(mainStats.totalLinks);
+      const activeLinksNum = Number(mainStats.activeLinks);
+      const totalClicksNum = Number(mainStats.totalClicks);
+      const todayClicksNum = Number(mainStats.todayClicks);
+      const yesterdayClicksNum = Number(mainStats.yesterdayClicks);
+      const thisMonthClicksNum = Number(mainStats.thisMonthClicks);
+      const thisMonthLinksNum = Number(mainStats.thisMonthLinks);
+      const lastMonthClicksNum = Number(mainStats.lastMonthClicks);
+      const lastMonthLinksNum = Number(mainStats.lastMonthLinks);
+
+      // Calcular percentuais
+      const clicksGrowthVsLastMonth = calculateGrowthPercentage(
+        thisMonthClicksNum,
+        lastMonthClicksNum
+      );
+
+      const clicksGrowthVsYesterday = calculateGrowthPercentage(
+        todayClicksNum,
+        yesterdayClicksNum
+      );
+
+      const linksGrowthVsLastMonth = calculateGrowthPercentage(
+        thisMonthLinksNum,
+        lastMonthLinksNum
+      );
+
+      const currentClickRate = calculateClickRate(
+        totalClicksNum,
+        totalLinksNum
+      );
+      const lastMonthClickRate = calculateClickRate(
+        lastMonthClicksNum,
+        lastMonthLinksNum || 1
+      );
+      const clickRateGrowth = calculateGrowthPercentage(
+        currentClickRate,
+        lastMonthClickRate
+      );
 
       return {
         success: true,
         data: {
           overview: {
-            totalLinks: overallStats.totalLinks,
-            activeLinks: overallStats.activeLinks,
-            totalClicks: overallStats.totalClicks,
-            inactiveLinks: overallStats.totalLinks - overallStats.activeLinks,
+            totalLinks: totalLinksNum,
+            activeLinks: activeLinksNum,
+            totalClicks: totalClicksNum,
+            inactiveLinks: totalLinksNum - activeLinksNum,
+            clickRate: currentClickRate,
           },
           periods: {
             today: {
-              clicks: todayStats.totalClicks,
-              newLinks: todayStats.totalLinks,
-              activeLinks: todayStats.activeLinks,
+              clicks: todayClicksNum,
+              clicksGrowthVsYesterday,
             },
-            thisWeek: {
-              clicks: weekStats.totalClicks,
-              newLinks: weekStats.totalLinks,
-              activeLinks: weekStats.activeLinks,
+            yesterday: {
+              clicks: yesterdayClicksNum,
             },
             thisMonth: {
-              clicks: monthStats.totalClicks,
-              newLinks: monthStats.totalLinks,
-              activeLinks: monthStats.activeLinks,
+              clicks: thisMonthClicksNum,
+              newLinks: thisMonthLinksNum,
+              clicksGrowthVsLastMonth,
+              linksGrowthVsLastMonth,
             },
+            lastMonth: {
+              clicks: lastMonthClicksNum,
+              newLinks: lastMonthLinksNum,
+            },
+          },
+          growth: {
+            clicksVsLastMonth: clicksGrowthVsLastMonth,
+            clicksVsYesterday: clicksGrowthVsYesterday,
+            linksVsLastMonth: linksGrowthVsLastMonth,
+            clickRateVsLastMonth: clickRateGrowth,
           },
           charts: {
             clicksOverTime: clicksOverTime.map((item) => ({
@@ -261,9 +290,9 @@ export const getUserStats = new Elysia().use(betterAuthPlugin).get(
   },
   {
     detail: {
-      summary: "Obter estatísticas gerais do usuário",
+      summary: "Obter estatísticas otimizadas do usuário",
       description:
-        "Retorna estatísticas completas do usuário logado, incluindo links, cliques e gráficos.",
+        "Retorna estatísticas completas do usuário com performance otimizada, usando menos consultas ao banco.",
     },
     query: t.Object({
       days: t.Optional(
@@ -271,13 +300,6 @@ export const getUserStats = new Elysia().use(betterAuthPlugin).get(
           minimum: 1,
           maximum: 365,
           description: "Número de dias para o gráfico de cliques (padrão: 30)",
-        })
-      ),
-      limit: t.Optional(
-        t.Numeric({
-          minimum: 1,
-          maximum: 50,
-          description: "Limite de links populares (padrão: 10)",
         })
       ),
     }),
