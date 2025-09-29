@@ -28,6 +28,17 @@ export const betterAuthPlugin = new Elysia({ name: "better-auth" })
         };
       },
     },
+    getUser: {
+      async resolve({ request: { headers } }) {
+        const session = await auth.api.getSession({
+          headers,
+        });
+
+        return {
+          user: session?.user,
+        };
+      },
+    },
   });
 
 export const OpenAPI = {

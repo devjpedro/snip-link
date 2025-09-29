@@ -39,6 +39,12 @@ export function HeroSection({ user }: { user: User | null }) {
     startTransition(async () => {
       const res = await createLinkAction(url, user?.id);
 
+      if (res?.data?.existingLink) {
+        setShortUrl(res.data.existingLink.shortUrl);
+        toast.info(res.error);
+        return;
+      }
+
       if (!res.success) {
         toast.error(res.error || "Ocorreu um erro. Tente novamente.");
         return;

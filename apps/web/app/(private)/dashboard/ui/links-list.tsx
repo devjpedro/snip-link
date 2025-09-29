@@ -21,59 +21,30 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
+import { BASE_REDIRECT_URL } from "@/app/constants/base-redirect-url";
+import { LONG_DELAY } from "@/app/constants/delay";
+import type { UserLinks } from "@/app/http/get-user-links";
 
-// Mock data
-const mockLinks = [
-  {
-    id: "1",
-    shortId: "abc123",
-    originalUrl: "https://github.com/usuario/projeto-incrivel",
-    customAlias: "projeto-github",
-    clicks: 156,
-    isActive: true,
-    createdAt: "2025-01-15T10:30:00Z",
-  },
-  {
-    id: "2",
-    shortId: "xyz789",
-    originalUrl: "https://docs.exemplo.com/api/documentacao-completa",
-    customAlias: null,
-    clicks: 89,
-    isActive: true,
-    createdAt: "2025-01-14T15:45:00Z",
-  },
-  {
-    id: "3",
-    shortId: "def456",
-    originalUrl: "https://blog.exemplo.com/artigo-sobre-desenvolvimento",
-    customAlias: "artigo-dev",
-    clicks: 234,
-    isActive: false,
-    createdAt: "2025-01-12T09:15:00Z",
-  },
-];
+type LinksListProps = {
+  links: UserLinks[];
+};
 
-const COPY_NOTIFICATION_DURATION_MS = 2000;
-
-export const LinksList = () => {
+export const LinksList = ({ links }: LinksListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const filteredLinks = mockLinks.filter(
-    (link) =>
-      link.originalUrl.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      link.customAlias?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const handleCopy = async (shortUrl: string, id: string) => {
-    await navigator.clipboard.writeText(`devlink.sh/s/${shortUrl}`);
+    await navigator.clipboard.writeText(`${BASE_REDIRECT_URL}/${shortUrl}`);
     setCopiedId(id);
-    setTimeout(() => setCopiedId(null), COPY_NOTIFICATION_DURATION_MS);
+    setTimeout(() => setCopiedId(null), LONG_DELAY);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("pt-BR", {
+  const formatDate = (date: Date | string) => {
+    const dateObj = typeof date === "string" ? new Date(date) : date;
+
+    return dateObj.toLocaleDateString("pt-BR", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -97,7 +68,7 @@ export const LinksList = () => {
       </div>
 
       <div className="space-y-4">
-        {filteredLinks.length === 0 ? (
+        {links.length === 0 ? (
           <MagicCard className="p-12">
             <div className="flex flex-col items-center justify-center">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
@@ -114,14 +85,19 @@ export const LinksList = () => {
             </div>
           </MagicCard>
         ) : (
-          filteredLinks.map((link) => (
+          links.map((link) => (
             <MagicCard className="p-6" key={link.id}>
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1 space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="font-mono font-semibold text-lg text-primary">
-                      devlink.sh/s/{link.customAlias || link.shortId}
-                    </div>
+                    <Link
+                      className="font-mono font-semibold text-lg text-primary hover:underline"
+                      href={`${BASE_REDIRECT_URL}/${link.customAlias || link.shortId}`}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      {BASE_REDIRECT_URL}/{link.customAlias || link.shortId}
+                    </Link>
                     <Badge variant={link.isActive ? "default" : "secondary"}>
                       {link.isActive ? "Ativo" : "Inativo"}
                     </Badge>
@@ -137,7 +113,7 @@ export const LinksList = () => {
                   <div className="flex items-center gap-6 text-muted-foreground text-sm">
                     <div className="flex items-center gap-1">
                       <BarChart3 className="h-4 w-4" />
-                      <span>{link.clicks} cliques</span>
+                      <span>{link.clickCount} cliques</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />

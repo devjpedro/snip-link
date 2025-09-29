@@ -1,9 +1,6 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@snip-link/ui/components/card";
+/** biome-ignore-all lint/suspicious/noArrayIndexKey: <Necessary index> */
+
+import { Skeleton } from "@snip-link/ui/components/skeleton";
 import {
   Tabs,
   TabsContent,
@@ -11,24 +8,10 @@ import {
   TabsTrigger,
 } from "@snip-link/ui/components/tabs";
 import { Link2, Plus } from "lucide-react";
-import { getUserLinks } from "@/app/http/get-user-links";
-import { getUserStats } from "@/app/http/get-user-stats";
-import { isApiSuccess } from "@/utils/api-guards";
-import { mapUserDashboardStats } from "@/utils/map-user-stats";
-import { CreateLinkForm } from "./ui/create-link-form";
-import { DashboardStats } from "./ui/dashboard-stats";
-import { LinksList } from "./ui/links-list";
+import { CardSkeleton } from "@/components/skeletons/card-skeleton";
+import { ListSkeleton } from "@/components/skeletons/list-skeleton";
 
-export default async function DashboardPage() {
-  const [resultStats, resultLinks] = await Promise.all([
-    getUserStats(),
-    getUserLinks(),
-  ]);
-
-  const stats = isApiSuccess(resultStats)
-    ? mapUserDashboardStats(resultStats.data)
-    : null;
-
+export default function Loading() {
   return (
     <main className="container mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <div className="space-y-6 sm:space-y-8">
@@ -41,7 +24,13 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <DashboardStats stats={stats} />
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={`dashboard-stat-skeleton-${index}`}>
+              <CardSkeleton />
+            </div>
+          ))}
+        </div>
 
         <Tabs className="space-y-4 sm:space-y-6" defaultValue="links">
           <TabsList className="mx-auto grid w-full max-w-md grid-cols-2 sm:mx-0">
@@ -54,6 +43,7 @@ export default async function DashboardPage() {
             </TabsTrigger>
             <TabsTrigger
               className="flex items-center gap-1 text-xs sm:gap-2 sm:text-sm"
+              disabled
               value="create"
             >
               <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -62,21 +52,15 @@ export default async function DashboardPage() {
           </TabsList>
 
           <TabsContent className="space-y-4 sm:space-y-6" value="links">
-            <LinksList links={resultLinks.links} />
-          </TabsContent>
+            <div className="space-y-6">
+              <Skeleton className="h-9 w-full" />
 
-          <TabsContent className="space-y-4 sm:space-y-6" value="create">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                  <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
-                  Criar Novo Link
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CreateLinkForm />
-              </CardContent>
-            </Card>
+              <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <ListSkeleton key={index} />
+                ))}
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

@@ -9,7 +9,8 @@ export type ApiSuccess<T> = {
 export type ApiError = {
   success: false;
   error: string;
-  data?: unknown;
+  // biome-ignore lint/suspicious/noExplicitAny: <Any necessary>
+  data?: any;
 };
 
 export type ApiResponse<T> = ApiSuccess<T> | ApiError;

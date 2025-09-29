@@ -4,10 +4,11 @@ import { db } from "@/db/client";
 import { clicks } from "@/db/schema/clicks";
 import { links } from "@/db/schema/links";
 import { HTTP_STATUS } from "../constants/http-status";
+import { betterAuthPlugin } from "../plugins/better-auth";
 
-export const redirectToUrl = new Elysia().get(
+export const redirectToUrl = new Elysia().use(betterAuthPlugin).get(
   "/r/:shortId",
-  async ({ params, set, redirect, request }) => {
+  async ({ params, set, redirect, request, user }) => {
     try {
       const { shortId } = params;
 
@@ -20,9 +21,12 @@ export const redirectToUrl = new Elysia().get(
       }
 
       const link = await db.query.links.findFirst({
-        where(fields, { eq: eqOp, and: andOp }) {
+        where(fields, { eq: eqOp, and: andOp, or: orOp }) {
           return andOp(
-            eqOp(fields.shortId, shortId),
+            orOp(
+              eqOp(fields.shortId, shortId),
+              eqOp(fields.customAlias, shortId)
+            ),
             eqOp(fields.isActive, true)
           );
         },
@@ -36,20 +40,22 @@ export const redirectToUrl = new Elysia().get(
         };
       }
 
-      await db.insert(clicks).values({
-        linkId: link.id,
-        userAgent: request.headers.get("user-agent") || null,
-        ipAddress:
-          request.headers.get("x-forwarded-for") ||
-          request.headers.get("x-real-ip") ||
-          "unknown",
-        referrer: request.headers.get("referer") || null,
-      });
+      if (user?.id !== link.userId) {
+        await db.insert(clicks).values({
+          linkId: link.id,
+          userAgent: request.headers.get("user-agent") || null,
+          ipAddress:
+            request.headers.get("x-forwarded-for") ||
+            request.headers.get("x-real-ip") ||
+            "unknown",
+          referrer: request.headers.get("referer") || null,
+        });
 
-      await db
-        .update(links)
-        .set({ clickCount: link.clickCount + 1 })
-        .where(eq(links.id, link.id));
+        await db
+          .update(links)
+          .set({ clickCount: link.clickCount + 1 })
+          .where(eq(links.id, link.id));
+      }
 
       return redirect(link.originalUrl);
     } catch {
@@ -61,6 +67,7 @@ export const redirectToUrl = new Elysia().get(
     }
   },
   {
+    getUser: true,
     detail: {
       summary: "Redirecionar para URL",
       description: "Redireciona para a URL original com base no ID curto",
