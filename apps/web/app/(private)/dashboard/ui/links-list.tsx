@@ -21,7 +21,6 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { BASE_REDIRECT_URL } from "@/app/constants/base-redirect-url";
@@ -110,14 +109,14 @@ export const LinksList = ({ links }: LinksListProps) => {
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1 space-y-3">
                   <div className="flex items-center gap-3">
-                    <Link
+                    <a
                       className="font-mono font-semibold text-lg text-primary hover:underline"
                       href={`${BASE_REDIRECT_URL}/${link.customAlias || link.shortId}`}
                       rel="noopener noreferrer"
                       target="_blank"
                     >
                       {BASE_REDIRECT_URL}/{link.customAlias || link.shortId}
-                    </Link>
+                    </a>
                     <Badge variant={link.isActive ? "default" : "secondary"}>
                       {link.isActive ? "Ativo" : "Inativo"}
                     </Badge>

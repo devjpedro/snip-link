@@ -1,3 +1,4 @@
+import { env } from "@snip-link/env";
 import { eq } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { db } from "@/db/client";
@@ -32,13 +33,7 @@ export const redirectToUrl = new Elysia().use(betterAuthPlugin).get(
         },
       });
 
-      if (!link) {
-        set.status = HTTP_STATUS.NOT_FOUND;
-        return {
-          success: false,
-          error: "Link não encontrado ou inativo.",
-        };
-      }
+      if (!link) return redirect(`${env.NEXT_PUBLIC_BASE_URL}/not-found`);
 
       if (user?.id !== link.userId) {
         await db.insert(clicks).values({

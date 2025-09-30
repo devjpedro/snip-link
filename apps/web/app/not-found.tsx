@@ -40,7 +40,7 @@ export default function NotFoundPage() {
           }}
         >
           <div className="bg-primary bg-clip-text font-bold text-[120px] text-transparent leading-none sm:text-[150px]">
-            404
+            Oops!
           </div>
           <motion.div
             animate={{
@@ -70,11 +70,12 @@ export default function NotFoundPage() {
         </motion.div>
 
         <h1 className="mb-4 font-bold text-2xl sm:text-3xl">
-          Página Não Encontrada
+          Página não encontrada
         </h1>
 
         <p className="mb-8 text-neutral-600 dark:text-neutral-400">
-          A página que você está procurando não existe ou foi movida.{" "}
+          A página que você está procurando não existe ou foi movida. Por favor,
+          verifique o URL ou volte para a página inicial.
         </p>
 
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
