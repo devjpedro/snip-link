@@ -78,13 +78,13 @@ export function StatsSection() {
           </p>
         </div>
 
-        <div className="mx-auto grid max-w-4xl grid-cols-2 gap-6 md:grid-cols-4">
+        <div className="mx-auto grid max-w-4xl grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
           {stats.map((stat, index) => (
             <Card
               className="border-border/50 bg-card/50 text-center backdrop-blur"
               key={stat.label}
             >
-              <CardContent className="p-6">
+              <CardContent className="px-3 py-6 sm:px-6">
                 <div className="mb-2 font-bold text-3xl text-primary">
                   {formatValue(animatedValues[index] ?? 0, index)}
                   {stat.suffix}

@@ -4,6 +4,7 @@ import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@snip-link/ui/lib/utils";
 import { XIcon } from "lucide-react";
 import type * as React from "react";
+import { VisuallyHidden } from "./visually-hidden";
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />;
@@ -55,6 +56,7 @@ function SheetContent({
     <SheetPortal>
       <SheetOverlay />
       <SheetPrimitive.Content
+        aria-describedby="sheet-content"
         className={cn(
           "fixed z-50 flex flex-col gap-4 bg-background shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:duration-300 data-[state=open]:duration-500",
           side === "right" &&
@@ -70,6 +72,13 @@ function SheetContent({
         data-slot="sheet-content"
         {...props}
       >
+        <VisuallyHidden>
+          <SheetTitle>Menu lateral</SheetTitle>
+          <SheetDescription id="sheet-content">
+            Navegue entre as opções do menu lateral.
+          </SheetDescription>
+        </VisuallyHidden>
+
         {children}
         <SheetPrimitive.Close className="absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
           <XIcon className="size-4" />

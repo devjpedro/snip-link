@@ -4,12 +4,13 @@ import { AnimatedThemeToggler } from "@snip-link/ui/components/animated-theme-to
 import { Button } from "@snip-link/ui/components/button";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetTrigger,
 } from "@snip-link/ui/components/sheet";
 import { cn } from "@snip-link/ui/lib/utils";
 import type { User as UserType } from "better-auth";
-import { LinkIcon, Menu, User } from "lucide-react";
+import { LinkIcon, LogOut, Menu, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -116,42 +117,86 @@ export function Header({ user }: HeaderProps) {
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent className="w-[300px] p-6 sm:w-[400px]" side="right">
-              <nav className="mt-8 flex flex-col space-y-6">
-                <Link
-                  className="px-2 py-1 font-medium text-lg text-muted-foreground transition-colors hover:text-foreground"
-                  href="/"
-                >
-                  Início
-                </Link>
-                <Link
-                  className="px-2 py-1 font-medium text-lg text-muted-foreground transition-colors hover:text-foreground"
-                  href="/dashboard"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  className="px-2 py-1 font-medium text-lg text-muted-foreground transition-colors hover:text-foreground"
-                  href="/analytics"
-                >
-                  Analytics
-                </Link>
-                <div className="space-y-4 border-border border-t pt-6">
-                  <Button
-                    asChild
-                    className="w-full justify-start"
-                    size="sm"
-                    variant="ghost"
-                  >
-                    <Link href="/login">
-                      <User className="mr-2 h-4 w-4" />
-                      Entrar
-                    </Link>
-                  </Button>
-                  <Button asChild className="w-full" size="sm">
-                    <Link href="/sign-up">Criar Conta</Link>
-                  </Button>
-                </div>
+
+            <SheetContent
+              aria-describedby="menu-lateral"
+              className="w-[300px] p-6 sm:w-[400px]"
+              side="right"
+            >
+              <nav
+                className={cn("flex flex-col space-y-6", {
+                  "mt-8": !!user,
+                  "mt-2": !user,
+                })}
+              >
+                {!!user && (
+                  <>
+                    <SheetClose asChild>
+                      <Link
+                        className="px-2 py-1 font-medium text-lg text-muted-foreground transition-colors hover:text-foreground"
+                        href="/"
+                      >
+                        Início
+                      </Link>
+                    </SheetClose>
+
+                    <SheetClose asChild>
+                      <Link
+                        className="px-2 py-1 font-medium text-lg text-muted-foreground transition-colors hover:text-foreground"
+                        href="/dashboard"
+                      >
+                        Dashboard
+                      </Link>
+                    </SheetClose>
+
+                    <SheetClose asChild>
+                      <Link
+                        className="px-2 py-1 font-medium text-lg text-muted-foreground transition-colors hover:text-foreground"
+                        href="/analytics"
+                      >
+                        Analytics
+                      </Link>
+                    </SheetClose>
+
+                    <SheetClose asChild>
+                      <Button
+                        className="h-10 w-full cursor-pointer"
+                        disabled={isPending}
+                        onClick={handleClickLogout}
+                        size="sm"
+                      >
+                        <span className="flex items-center justify-center gap-2">
+                          <LogOut />
+                          Sair
+                        </span>
+                      </Button>
+                    </SheetClose>
+                  </>
+                )}
+
+                {!user && (
+                  <div className="space-y-4 border-transparent border-t">
+                    <SheetClose asChild>
+                      <Button
+                        asChild
+                        className="h-10 w-full justify-start"
+                        size="sm"
+                        variant="ghost"
+                      >
+                        <Link href="/login">
+                          <User className="mr-2 h-4 w-4" />
+                          Entrar
+                        </Link>
+                      </Button>
+                    </SheetClose>
+
+                    <SheetClose asChild>
+                      <Button asChild className="h-10 w-full" size="sm">
+                        <Link href="/sign-up">Criar Conta</Link>
+                      </Button>
+                    </SheetClose>
+                  </div>
+                )}
               </nav>
             </SheetContent>
           </Sheet>

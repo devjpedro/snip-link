@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, lte } from "drizzle-orm";
+import { and, count, desc, eq, gte, like, lte, or } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { db } from "@/db/client";
 import { links } from "@/db/schema/links";
@@ -7,10 +7,55 @@ import { betterAuthPlugin } from "@/http/plugins/better-auth";
 
 const statusEnum = t.Enum({ active: "active", inactive: "inactive" });
 
+const buildSearchConditions = (searchText: string) => {
+  return (fields: typeof links) => {
+    const conditions = [
+      like(fields.shortId, `%${searchText}%`),
+      like(fields.originalUrl, `%${searchText}%`),
+    ];
+
+    if (fields.customAlias) {
+      conditions.push(like(fields.customAlias, `%${searchText}%`));
+    }
+
+    return or(...conditions);
+  };
+};
+
+// biome-ignore lint/nursery/useMaxParams: <NECESSARY>
+const buildWhereConditions = (
+  userId: string,
+  linkId?: string,
+  status?: "active" | "inactive",
+  from?: string,
+  to?: string,
+  searchText?: string
+) => {
+  // biome-ignore lint/suspicious/noExplicitAny: <NECESSARY>
+  return (fields: any) => {
+    const conditions = [eq(fields.userId, userId)];
+
+    if (linkId) conditions.push(eq(fields.id, linkId));
+    if (status === "active") conditions.push(eq(fields.isActive, true));
+    if (status === "inactive") conditions.push(eq(fields.isActive, false));
+    if (from) conditions.push(gte(fields.createdAt, new Date(from)));
+    if (to) conditions.push(lte(fields.createdAt, new Date(to)));
+
+    if (searchText) {
+      const searchConditions = buildSearchConditions(searchText)(fields);
+      if (searchConditions) {
+        conditions.push(searchConditions);
+      }
+    }
+
+    return and(...conditions);
+  };
+};
+
 export const getLinks = new Elysia().use(betterAuthPlugin).get(
   "/",
   async ({ user, query, set }) => {
-    const { pageIndex, linkId, status, from, to } = query;
+    const { pageIndex, linkId, status, from, to, searchText } = query;
 
     const baseQuery = db
       .select({
@@ -26,15 +71,14 @@ export const getLinks = new Elysia().use(betterAuthPlugin).get(
       })
       .from(links)
       .where((fields) => {
-        const conditions = [eq(fields.userId, user.id)];
-
-        if (linkId) conditions.push(eq(fields.id, linkId));
-        if (status === "active") conditions.push(eq(fields.isActive, true));
-        if (status === "inactive") conditions.push(eq(fields.isActive, false));
-        if (from) conditions.push(gte(fields.createdAt, new Date(from)));
-        if (to) conditions.push(lte(fields.createdAt, new Date(to)));
-
-        return and(...conditions);
+        return buildWhereConditions(
+          user.id,
+          linkId,
+          status,
+          from,
+          to,
+          searchText
+        )(fields);
       });
 
     const [amountOfLinksQuery, allLinks] = await Promise.all([
@@ -65,6 +109,7 @@ export const getLinks = new Elysia().use(betterAuthPlugin).get(
   {
     auth: true,
     query: t.Object({
+      searchText: t.Optional(t.String()),
       linkId: t.Optional(t.String()),
       from: t.Optional(t.String({ format: "date-time" })),
       to: t.Optional(t.String({ format: "date-time" })),

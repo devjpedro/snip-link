@@ -85,7 +85,7 @@ export function HeroSection({ user }: { user: User | null }) {
           </div>
 
           <Card className="mx-auto max-w-2xl border-border/50 bg-card/50 backdrop-blur">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="space-y-4">
                 <div className="flex gap-2">
                   <Input
@@ -96,7 +96,7 @@ export function HeroSection({ user }: { user: User | null }) {
                     value={url}
                   />
                   <Button
-                    className="h-12 px-8"
+                    className="hidden h-12 px-6 sm:inline-flex sm:px-8"
                     disabled={!url || isPending}
                     onClick={handleShorten}
                     size="lg"
@@ -105,9 +105,21 @@ export function HeroSection({ user }: { user: User | null }) {
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                     ) : (
                       <>
-                        <LinkIcon className="mr-2 h-4 w-4" />
+                        <LinkIcon className="mr-0 h-4 w-4 sm:mr-2" />
                         Encurtar
                       </>
+                    )}
+                  </Button>
+                  <Button
+                    className="inline-flex h-12 px-6 sm:hidden sm:px-8"
+                    disabled={!url || isPending}
+                    onClick={handleShorten}
+                    size="icon"
+                  >
+                    {isPending ? (
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    ) : (
+                      <LinkIcon className="mr-0 h-4 w-4 sm:mr-2" />
                     )}
                   </Button>
                 </div>

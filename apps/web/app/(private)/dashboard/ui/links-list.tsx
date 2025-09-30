@@ -106,11 +106,11 @@ export const LinksList = ({ links }: LinksListProps) => {
         ) : (
           links.map((link) => (
             <MagicCard className="p-6" key={link.id}>
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0 flex-1 space-y-3">
-                  <div className="flex items-center gap-3">
+              <div className="flex flex-col items-start justify-between gap-4 md:flex-row">
+                <div className="order-1 min-w-0 max-w-fill flex-1 space-y-3 md:order-0">
+                  <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                     <a
-                      className="font-mono font-semibold text-lg text-primary hover:underline"
+                      className="order-1 max-w-full truncate font-mono font-semibold text-lg text-primary hover:underline sm:order-0"
                       href={`${BASE_REDIRECT_URL}/${link.customAlias || link.shortId}`}
                       rel="noopener noreferrer"
                       target="_blank"

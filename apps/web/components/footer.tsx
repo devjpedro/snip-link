@@ -6,9 +6,12 @@ export function Footer() {
   return (
     <footer className="border-border border-t bg-card">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 text-center sm:text-left md:grid-cols-4">
           <div className="space-y-4">
-            <Link className="flex items-center space-x-2" href="/">
+            <Link
+              className="flex items-center justify-center space-x-2 sm:justify-start"
+              href="/"
+            >
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                 <LinkIcon className="h-5 w-5 text-primary-foreground" />
               </div>
@@ -90,7 +93,7 @@ export function Footer() {
 
           <div>
             <h3 className="mb-4 font-semibold">Conecte-se</h3>
-            <div className="flex space-x-4">
+            <div className="flex justify-center space-x-4 sm:justify-start">
               <Link
                 className="text-muted-foreground transition-colors hover:text-foreground"
                 href="#"
