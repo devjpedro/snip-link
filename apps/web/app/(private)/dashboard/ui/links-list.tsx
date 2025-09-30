@@ -23,9 +23,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 import { BASE_REDIRECT_URL } from "@/app/constants/base-redirect-url";
 import { LONG_DELAY } from "@/app/constants/delay";
 import type { UserLinks } from "@/app/http/get-user-links";
+import { removeLinkAction } from "../actions";
 
 type LinksListProps = {
   links: UserLinks[];
@@ -53,6 +55,15 @@ export const LinksList = ({ links }: LinksListProps) => {
 
   const truncateUrl = (url: string, maxLength = 50) => {
     return url.length > maxLength ? `${url.substring(0, maxLength)}...` : url;
+  };
+
+  // biome-ignore lint/suspicious/useAwait: <Necessary>
+  const handleClickDelete = async (linkId: string) => {
+    toast.promise(removeLinkAction(linkId), {
+      loading: "Excluindo link...",
+      success: (response) => response.message || "Link excluído com sucesso!",
+      error: () => "Ocorreu um erro ao excluir o link.",
+    });
   };
 
   return (
@@ -152,7 +163,10 @@ export const LinksList = ({ links }: LinksListProps) => {
                         <Edit className="mr-2 h-4 w-4" />
                         Editar
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => handleClickDelete(link.id)}
+                      >
                         <Trash2 className="mr-2 h-4 w-4 text-destructive" />
                         Excluir
                       </DropdownMenuItem>

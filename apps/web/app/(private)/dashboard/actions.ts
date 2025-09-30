@@ -1,6 +1,7 @@
 "use server";
 
 import { createLink } from "@/app/http/create-link";
+import { deleteLink } from "@/app/http/delete-link";
 
 type CreatePrivateLinkActionType = {
   originalUrl: string;
@@ -22,3 +23,11 @@ export const createPrivateLinkAction = async ({
 
   return result;
 };
+
+export async function removeLinkAction(linkId: string) {
+  const res = await deleteLink({
+    id: linkId,
+  });
+
+  return res;
+}

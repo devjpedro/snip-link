@@ -43,7 +43,7 @@ export const deleteLink = new Elysia().use(betterAuthPlugin).delete(
 
     await db.delete(links).where(eq(links.id, linkId));
 
-    set.status = HTTP_STATUS.OK;
+    set.status = HTTP_STATUS.CREATED;
 
     return {
       success: true,
