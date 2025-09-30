@@ -1,4 +1,5 @@
 import Elysia from "elysia";
+import { changeStatusLink } from "./change-status-link";
 import { createPrivateLink } from "./create-link";
 import { createPublicLink } from "./create-public-link";
 import { deleteLink } from "./delete-link";
@@ -15,4 +16,5 @@ export const linksRoutes = new Elysia({
   .use(getLinkDetail)
   .use(updateLink)
   .use(getLinks)
-  .use(deleteLink);
+  .use(deleteLink)
+  .use(changeStatusLink);

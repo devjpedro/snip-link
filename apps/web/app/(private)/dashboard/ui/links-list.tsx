@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { BASE_REDIRECT_URL } from "@/app/constants/base-redirect-url";
 import { LONG_DELAY } from "@/app/constants/delay";
 import type { UserLinks } from "@/app/http/get-user-links";
-import { removeLinkAction } from "../actions";
+import { removeLinkAction, updateLinkStatusAction } from "../actions";
 
 type LinksListProps = {
   links: UserLinks[];
@@ -63,6 +63,15 @@ export const LinksList = ({ links }: LinksListProps) => {
       loading: "Excluindo link...",
       success: (response) => response.message || "Link excluído com sucesso!",
       error: () => "Ocorreu um erro ao excluir o link.",
+    });
+  };
+
+  const handleClickUpdateStatus = (linkId: string, isActive: boolean) => {
+    toast.promise(updateLinkStatusAction(linkId, isActive), {
+      loading: "Atualizando status...",
+      success: (response) =>
+        response.message || "Status atualizado com sucesso!",
+      error: () => "Ocorreu um erro ao atualizar o status.",
     });
   };
 
@@ -159,9 +168,13 @@ export const LinksList = ({ links }: LinksListProps) => {
                         <BarChart3 className="mr-2 h-4 w-4" />
                         Ver Analytics
                       </DropdownMenuItem> */}
-                      <DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleClickUpdateStatus(link.id, !link.isActive)
+                        }
+                      >
                         <Edit className="mr-2 h-4 w-4" />
-                        Editar
+                        {link.isActive ? "Desativar" : "Ativar"}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-destructive"
