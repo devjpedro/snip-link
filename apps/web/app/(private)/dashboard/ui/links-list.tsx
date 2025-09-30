@@ -144,10 +144,10 @@ export const LinksList = ({ links }: LinksListProps) => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
+                      {/* <DropdownMenuItem>
                         <BarChart3 className="mr-2 h-4 w-4" />
                         Ver Analytics
-                      </DropdownMenuItem>
+                      </DropdownMenuItem> */}
                       <DropdownMenuItem>
                         <Edit className="mr-2 h-4 w-4" />
                         Editar

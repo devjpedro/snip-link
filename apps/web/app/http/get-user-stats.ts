@@ -1,4 +1,5 @@
-import { headers } from "next/headers";
+"use server";
+
 import {
   type ApiError,
   type ApiResponse,
@@ -11,7 +12,9 @@ export const getUserStats = async (): Promise<ApiResponse<UserStatsData>> => {
   try {
     const result = await api
       .get("analytics", {
-        headers: await headers(),
+        next: {
+          tags: ["user-stats"],
+        },
       })
       .json<ApiResponse<UserStatsData>>();
 

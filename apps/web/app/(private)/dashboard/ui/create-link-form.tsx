@@ -1,51 +1,101 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { env } from "@snip-link/env";
 import { Button } from "@snip-link/ui/components/button";
-import { Card, CardContent } from "@snip-link/ui/components/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@snip-link/ui/components/form";
 import { Input } from "@snip-link/ui/components/input";
 import { Label } from "@snip-link/ui/components/label";
 import { Switch } from "@snip-link/ui/components/switch";
-import { Textarea } from "@snip-link/ui/components/textarea";
-import { AlertCircle, Check, Copy, LinkIcon } from "lucide-react";
-import type React from "react";
+import { LinkIcon } from "lucide-react";
 import { useState } from "react";
-import { DELAY, LONG_DELAY } from "@/app/constants/delay";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import z from "zod";
+import { BASE_REDIRECT_URL } from "@/app/constants/base-redirect-url";
+import { LONG_DELAY } from "@/app/constants/delay";
+import { ResultLink } from "@/components/result-link";
+import { createPrivateLinkAction } from "../actions";
 
-const BASE_36 = 36;
-const SHORT_ID_LENGTH = 6;
+const MIN_ALIAS_LENGTH = 3;
+const MAX_ALIAS_LENGTH = 50;
+
+const formSchema = z.object({
+  originalUrl: z
+    .url("URL inválida")
+    .min(1, "URL é obrigatória")
+    .refine(
+      (val) => val.startsWith(env.NEXT_PUBLIC_API_URL) === false,
+      "Não é possível encurtar uma URL do próprio serviço"
+    ),
+  customAlias: z
+    .string()
+    .trim()
+    .transform((val) => (val === "" ? undefined : val))
+    .optional()
+    .refine(
+      (val) => !val || val.length >= MIN_ALIAS_LENGTH,
+      `Alias deve conter pelo menos ${MIN_ALIAS_LENGTH} caracteres`
+    )
+    .refine(
+      (val) => !val || val.length <= MAX_ALIAS_LENGTH,
+      `Alias deve conter no máximo ${MAX_ALIAS_LENGTH} caracteres`
+    ),
+  isActive: z.boolean().optional(),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export const CreateLinkForm = () => {
-  const [formData, setFormData] = useState({
-    originalUrl: "",
-    customAlias: "",
-    description: "",
-    isActive: true,
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
   const [shortUrl, setShortUrl] = useState("");
   const [copied, setCopied] = useState(false);
-  const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      originalUrl: "",
+      customAlias: "",
+      isActive: true,
+    },
+  });
 
-    if (!formData.originalUrl) {
-      setError("URL é obrigatória");
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = form;
+
+  const handleFormSubmit = async (data: FormData) => {
+    const { originalUrl, customAlias, isActive } = data;
+
+    setShortUrl("");
+
+    const res = await createPrivateLinkAction({
+      originalUrl,
+      customAlias,
+      isActive,
+    });
+
+    if (res?.data?.existingLink) {
+      toast.info(res.error);
       return;
     }
 
-    setIsLoading(true);
+    if (!res.success) {
+      toast.error(res.error || "Ocorreu um erro. Tente novamente.");
+      return;
+    }
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, DELAY));
+    if (res.success && res.data) setShortUrl(res.data.shortUrl);
 
-    const shortId =
-      formData.customAlias ||
-      Math.random().toString(BASE_36).substr(2, SHORT_ID_LENGTH);
-    setShortUrl(`devlink.sh/s/${shortId}`);
-    setIsLoading(false);
+    toast.success("Link criado com sucesso!");
+    form.reset();
   };
 
   const handleCopy = async () => {
@@ -54,138 +104,110 @@ export const CreateLinkForm = () => {
     setTimeout(() => setCopied(false), LONG_DELAY);
   };
 
-  const handleReset = () => {
-    setFormData({
-      originalUrl: "",
-      customAlias: "",
-      description: "",
-      isActive: true,
-    });
-    setShortUrl("");
-    setError("");
-  };
-
   return (
     <div className="space-y-6">
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        <div className="space-y-2">
-          <Label htmlFor="originalUrl">URL Original *</Label>
-          <Input
-            className="h-12"
-            id="originalUrl"
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, originalUrl: e.target.value }))
-            }
-            placeholder="https://exemplo.com/sua-url-longa"
-            type="url"
-            value={formData.originalUrl}
+      <Form {...form}>
+        <form className="space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
+          <FormField
+            control={form.control}
+            name="originalUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="originalUrl">URL Original</FormLabel>
+                <FormControl>
+                  <Input
+                    className="h-12"
+                    disabled={isSubmitting}
+                    id="originalUrl"
+                    placeholder="https://exemplo.com/sua-url-longa"
+                    type="url"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="customAlias">Alias Personalizado (opcional)</Label>
-          <div className="flex items-center">
-            <span className="mr-2 text-muted-foreground text-sm">
-              devlink.sh/s/
-            </span>
-            <Input
-              className="flex-1"
-              id="customAlias"
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  customAlias: e.target.value,
-                }))
-              }
-              placeholder="meu-link-personalizado"
-              value={formData.customAlias}
+          <FormField
+            control={form.control}
+            name="customAlias"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="customAlias">Alias personalizado</FormLabel>
+                <FormControl>
+                  <div className="space-y-1">
+                    <div className="flex items-center">
+                      <span className="mr-2 text-muted-foreground text-sm">
+                        {BASE_REDIRECT_URL}/
+                      </span>
+
+                      <Input
+                        className="flex-1"
+                        disabled={isSubmitting}
+                        id="customAlias"
+                        placeholder="meu-link-personalizado"
+                        {...field}
+                      />
+                    </div>
+                    <p className="text-muted-foreground text-xs">
+                      Deixe em branco para gerar automaticamente
+                    </p>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex items-center justify-between">
+            <FormField
+              control={form.control}
+              name="isActive"
+              render={({ field }) => (
+                <FormItem className="flex w-full items-center">
+                  <div className="flex-1 space-y-1">
+                    <Label>Status do Link</Label>
+                    <p className="text-muted-foreground text-xs">
+                      Links inativos não redirecionam
+                    </p>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value ?? true}
+                      disabled={isSubmitting}
+                      id="isActive"
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </div>
-          <p className="text-muted-foreground text-xs">
-            Deixe em branco para gerar automaticamente
-          </p>
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="description">Descrição (opcional)</Label>
-          <Textarea
-            id="description"
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, description: e.target.value }))
-            }
-            placeholder="Adicione uma descrição para organizar seus links..."
-            rows={3}
-            value={formData.description}
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <Label>Status do Link</Label>
-            <p className="text-muted-foreground text-xs">
-              Links inativos não redirecionam
-            </p>
-          </div>
-          <Switch
-            checked={formData.isActive}
-            onCheckedChange={(checked) =>
-              setFormData((prev) => ({ ...prev, isActive: checked }))
-            }
-          />
-        </div>
-
-        {error && (
-          <div className="flex items-center gap-2 text-destructive text-sm">
-            <AlertCircle className="h-4 w-4" />
-            {error}
-          </div>
-        )}
-
-        <Button className="w-full" disabled={isLoading} size="lg" type="submit">
-          {isLoading ? (
-            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-          ) : (
-            <LinkIcon className="mr-2 h-4 w-4" />
-          )}
-          {isLoading ? "Criando..." : "Criar Link"}
-        </Button>
-      </form>
+          <Button
+            className="w-full"
+            disabled={isSubmitting}
+            size="lg"
+            type="submit"
+          >
+            {isSubmitting ? (
+              <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            ) : (
+              <LinkIcon className="mr-2 h-4 w-4" />
+            )}
+            {isSubmitting ? "Criando..." : "Criar Link"}
+          </Button>
+        </form>
+      </Form>
 
       {shortUrl && (
-        <Card className="border-primary/20 bg-primary/5">
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-primary">
-                <Check className="h-5 w-5" />
-                <span className="font-semibold">Link criado com sucesso!</span>
-              </div>
-
-              <div className="flex items-center gap-2 rounded-lg border bg-background p-3">
-                <div className="flex-1 font-mono text-sm">{shortUrl}</div>
-                <Button onClick={handleCopy} size="sm" variant="ghost">
-                  {copied ? (
-                    <Check className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  className="flex-1 bg-transparent"
-                  onClick={handleReset}
-                  variant="outline"
-                >
-                  Criar Outro
-                </Button>
-                <Button className="flex-1 bg-transparent" variant="outline">
-                  Ver Analytics
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <ResultLink
+          copied={copied}
+          handleCopy={handleCopy}
+          shortUrl={shortUrl}
+        />
       )}
     </div>
   );

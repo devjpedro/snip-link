@@ -70,7 +70,7 @@ export default async function DashboardPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                   <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
-                  Criar Novo Link
+                  Criar novo link
                 </CardTitle>
               </CardHeader>
               <CardContent>

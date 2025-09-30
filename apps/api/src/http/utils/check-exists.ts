@@ -1,3 +1,4 @@
+import { isNull } from "drizzle-orm";
 import { db } from "@/db/client";
 
 export const checkIfShortIdExists = async (
@@ -30,25 +31,33 @@ export const checkIfCustomAliasExists = async (
   };
 };
 
-export const checkIfUrlAlreadyExists = async (
-  originalUrl: string,
+export const checkIfAliasAlreadyExists = async (
+  aliasOrShortId: string,
   userId: string
 ): Promise<{
   id: string;
   shortId: string;
   customAlias: string | null;
+  originalUrl: string;
 } | null> => {
   const existing = await db.query.links.findFirst({
-    where: (linksTable, { eq, and }) =>
+    where: (linksTable, { eq, and, or }) =>
       and(
-        eq(linksTable.originalUrl, originalUrl),
         eq(linksTable.userId, userId),
-        eq(linksTable.isActive, true)
+        eq(linksTable.isActive, true),
+        or(
+          eq(linksTable.customAlias, aliasOrShortId),
+          and(
+            isNull(linksTable.customAlias),
+            eq(linksTable.shortId, aliasOrShortId)
+          )
+        )
       ),
     columns: {
       id: true,
       shortId: true,
       customAlias: true,
+      originalUrl: true,
     },
   });
 
@@ -67,10 +76,10 @@ export const checkIfAnonymousUrlExists = async (
   updatedAt: Date;
 } | null> => {
   const existing = await db.query.links.findFirst({
-    where: (linksTable, { eq, and, isNull }) =>
+    where: (linksTable, { eq, and, isNull: isNullOp }) =>
       and(
         eq(linksTable.originalUrl, originalUrl),
-        isNull(linksTable.userId),
+        isNullOp(linksTable.userId),
         eq(linksTable.isActive, true)
       ),
   });

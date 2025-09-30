@@ -1,5 +1,8 @@
+// biome-ignore-all lint/suspicious/noConsole: <Necessary>
+
 import { env } from "@snip-link/env";
 import ky from "ky";
+import { cookies } from "next/headers";
 import { DELAY } from "../constants/delay";
 
 function sleep(ms: number) {
@@ -14,9 +17,23 @@ export const api = ky.create({
   credentials: "include",
   hooks: {
     beforeRequest: [
-      async () => {
+      async (request) => {
         if (process.env.NODE_ENV === "development") {
           await sleep(DELAY);
+        }
+
+        if (typeof window === "undefined") {
+          try {
+            const cookieStore = await cookies();
+            const cookieHeader = cookieStore
+              .getAll()
+              .map((cookie) => `${cookie.name}=${cookie.value}`)
+              .join("; ");
+
+            if (cookieHeader) request.headers.set("Cookie", cookieHeader);
+          } catch (error) {
+            console.error("Failed to set cookies on request:", error);
+          }
         }
       },
     ],

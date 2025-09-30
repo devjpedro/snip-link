@@ -1,3 +1,6 @@
+"use server";
+
+import { revalidateTag } from "next/cache";
 import {
   type ApiError,
   type ApiResponse,
@@ -7,7 +10,8 @@ import { api } from "./api-client";
 
 type CreateLinkRequest = {
   originalUrl: string;
-  customAlias?: string;
+  customAlias?: string | undefined;
+  isActive?: boolean | undefined;
 };
 
 type CreateLinkResponse = {
@@ -20,6 +24,7 @@ type CreateLinkResponse = {
 export const createLink = async ({
   originalUrl,
   customAlias,
+  isActive = true,
   isPrivate = true,
 }: CreateLinkRequest & {
   isPrivate?: boolean;
@@ -29,9 +34,14 @@ export const createLink = async ({
   try {
     const result = await api
       .post<CreateLinkRequest>(endpointPath, {
-        json: { originalUrl, customAlias },
+        json: { originalUrl, customAlias, isActive },
       })
       .json<ApiResponse<CreateLinkResponse>>();
+
+    if (result.success && isPrivate) {
+      revalidateTag("user-stats");
+      revalidateTag("user-links");
+    }
 
     return result;
   } catch (error: unknown) {

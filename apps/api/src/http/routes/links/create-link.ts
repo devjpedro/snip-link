@@ -5,7 +5,7 @@ import { links } from "@/db/schema/links";
 import { HTTP_STATUS } from "@/http/constants/http-status";
 import { betterAuthPlugin } from "@/http/plugins/better-auth";
 import { linkBodySchema, linkResponseSchema } from "@/http/schemas/create-link";
-import { checkIfUrlAlreadyExists } from "@/http/utils/check-exists";
+import { checkIfAliasAlreadyExists } from "@/http/utils/check-exists";
 import { validateUrlInput } from "@/http/utils/check-valid-url";
 import { generateUniqueShortId } from "@/http/utils/generate-short-id";
 import { processCustomAlias } from "@/http/utils/process-custom-alias";
@@ -15,12 +15,21 @@ export const buildShortUrl = (shortId: string) => {
   return `${env.BETTER_AUTH_URL}/r/${shortId}`;
 };
 
-export const createLinkInDatabase = async (
-  shortId: string,
-  originalUrl: string,
-  customAlias: string | undefined,
-  userId?: string
-) => {
+type CreateLinkInDatabase = {
+  shortId: string;
+  originalUrl: string;
+  customAlias: string | undefined;
+  userId?: string;
+  isActive?: boolean | undefined;
+};
+
+export const createLinkInDatabase = async ({
+  shortId,
+  originalUrl,
+  customAlias,
+  userId,
+  isActive,
+}: CreateLinkInDatabase) => {
   const [newLink] = await db
     .insert(links)
     .values({
@@ -28,6 +37,7 @@ export const createLinkInDatabase = async (
       originalUrl,
       customAlias: customAlias || null,
       userId: userId || null,
+      isActive: isActive !== undefined ? isActive : true,
     })
     .returning();
 
@@ -59,7 +69,7 @@ export const createPrivateLink = new Elysia().use(betterAuthPlugin).post(
   "/",
   async ({ body, set, user }) => {
     try {
-      const { originalUrl, customAlias } = body;
+      const { originalUrl, customAlias, isActive } = body;
 
       const urlValidation = validateUrlInput(originalUrl);
       if (!urlValidation.isValid) {
@@ -70,10 +80,11 @@ export const createPrivateLink = new Elysia().use(betterAuthPlugin).post(
         };
       }
 
-      const existingUrlLink = await checkIfUrlAlreadyExists(
+      const existingUrlLink = await checkIfAliasAlreadyExists(
         originalUrl,
         user.id
       );
+
       if (existingUrlLink) {
         set.status = HTTP_STATUS.CONFLICT;
         return {
@@ -123,12 +134,14 @@ export const createPrivateLink = new Elysia().use(betterAuthPlugin).post(
         shortId = generatedShortId;
       }
 
-      const newLink = await createLinkInDatabase(
-        shortId,
+      const newLink = await createLinkInDatabase({
         originalUrl,
+        shortId,
         customAlias,
-        user.id
-      );
+        userId: user.id,
+        isActive,
+      });
+
       if (!newLink) {
         set.status = HTTP_STATUS.INTERNAL_SERVER_ERROR;
         return {

@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { api } from "./api-client";
 
 type UserLinksRequest = {
@@ -41,7 +40,6 @@ export const getUserLinks = async ({
 }: UserLinksRequest = {}) => {
   const result = await api
     .get("links", {
-      headers: await headers(),
       searchParams: {
         linkId,
         from,
@@ -49,6 +47,7 @@ export const getUserLinks = async ({
         status,
         pageIndex,
       },
+      next: { tags: ["user-links"] },
     })
     .json<UserLinksResponse>();
 

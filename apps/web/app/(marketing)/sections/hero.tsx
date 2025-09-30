@@ -5,11 +5,12 @@ import { Button } from "@snip-link/ui/components/button";
 import { Card, CardContent } from "@snip-link/ui/components/card";
 import { Input } from "@snip-link/ui/components/input";
 import type { User } from "better-auth";
-import { BarChart3, Check, Copy, LinkIcon, Shield, Zap } from "lucide-react";
+import { BarChart3, LinkIcon, Shield, Zap } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { branding } from "@/app/constants/branding";
 import { LONG_DELAY } from "@/app/constants/delay";
+import { ResultLink } from "@/components/result-link";
 import { createLinkAction } from "../actions";
 
 export function HeroSection({ user }: { user: User | null }) {
@@ -112,23 +113,11 @@ export function HeroSection({ user }: { user: User | null }) {
                 </div>
 
                 {shortUrl && (
-                  <div className="flex animate-fade-in-up items-center gap-2 rounded-lg border bg-muted/50 p-3">
-                    <div className="flex-1 font-mono text-foreground text-sm">
-                      {shortUrl}
-                    </div>
-                    <Button
-                      className="shrink-0"
-                      onClick={handleCopy}
-                      size="sm"
-                      variant="ghost"
-                    >
-                      {copied ? (
-                        <Check className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+                  <ResultLink
+                    copied={copied}
+                    handleCopy={handleCopy}
+                    shortUrl={shortUrl}
+                  />
                 )}
               </div>
             </CardContent>

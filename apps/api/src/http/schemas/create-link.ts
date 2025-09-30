@@ -14,6 +14,12 @@ export const linkBodySchema = t.Object({
       examples: ["meu-link"],
     })
   ),
+  isActive: t.Optional(
+    t.Boolean({
+      description: "Indica se o link está ativo",
+      default: true,
+    })
+  ),
 });
 
 export const linkResponseSchema = {
