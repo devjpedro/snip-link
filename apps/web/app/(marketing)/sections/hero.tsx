@@ -4,6 +4,7 @@ import { env } from "@snip-link/env";
 import { Button } from "@snip-link/ui/components/button";
 import { Card, CardContent } from "@snip-link/ui/components/card";
 import { Input } from "@snip-link/ui/components/input";
+import { useQueryClient } from "@tanstack/react-query";
 import type { User } from "better-auth";
 import { BarChart3, LinkIcon, Shield, Zap } from "lucide-react";
 import { useState, useTransition } from "react";
@@ -19,6 +20,8 @@ export function HeroSection({ user }: { user: User | null }) {
   const [copied, setCopied] = useState(false);
 
   const [isPending, startTransition] = useTransition();
+
+  const queryClient = useQueryClient();
 
   const handleShorten = () => {
     if (!url) return;
@@ -52,6 +55,12 @@ export function HeroSection({ user }: { user: User | null }) {
       }
 
       if (res.success && res.data) setShortUrl(res.data.shortUrl);
+
+      if (user) {
+        queryClient.invalidateQueries({
+          queryKey: ["user-links"],
+        });
+      }
 
       setUrl("");
     });

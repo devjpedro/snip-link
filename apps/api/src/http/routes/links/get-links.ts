@@ -5,6 +5,8 @@ import { links } from "@/db/schema/links";
 import { HTTP_STATUS } from "@/http/constants/http-status";
 import { betterAuthPlugin } from "@/http/plugins/better-auth";
 
+const PAGE_SIZE = 10;
+
 const statusEnum = t.Enum({ active: "active", inactive: "inactive" });
 
 const buildSearchConditions = (searchText: string) => {
@@ -86,8 +88,8 @@ export const getLinks = new Elysia().use(betterAuthPlugin).get(
       db
         .select()
         .from(baseQuery.as("baseQuery"))
-        .limit(10)
-        .offset(pageIndex * 10)
+        .limit(PAGE_SIZE)
+        .offset(pageIndex * PAGE_SIZE)
         .orderBy((fields) => {
           return [desc(fields.createdAt)];
         }),
@@ -101,7 +103,9 @@ export const getLinks = new Elysia().use(betterAuthPlugin).get(
       links: allLinks,
       meta: {
         pageIndex,
-        pageSize: 20,
+        nextPageIndex:
+          amountOfLinks > (pageIndex + 1) * PAGE_SIZE ? pageIndex + 1 : null,
+        pageSize: PAGE_SIZE,
         totalCount: amountOfLinks,
       },
     };

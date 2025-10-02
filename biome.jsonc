@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "extends": ["ultracite"],
   "files": {
-    "includes": ["**", "!**/db/migrations", "!**/*.sql"]
+    "includes": ["**", "!**/db/migrations", "!**/*.sql", "!**/globals.css"]
   },
   "linter": {
     "rules": {
@@ -13,7 +13,8 @@
         "noNamespaceImport": "off"
       },
       "suspicious": {
-        "noUnknownAtRules": "off"
+        "noUnknownAtRules": "off",
+        "useAwait": "off"
       }
     }
   }

@@ -13,11 +13,12 @@ import {
 import { Link2, Plus } from "lucide-react";
 import { getUserLinks } from "@/app/http/get-user-links";
 import { getUserStats } from "@/app/http/get-user-stats";
+import { RedirectToTop } from "@/components/redirect-to-top";
 import { isApiSuccess } from "@/utils/api-guards";
 import { mapUserDashboardStats } from "@/utils/map-user-stats";
 import { CreateLinkForm } from "./ui/create-link-form";
 import { DashboardStats } from "./ui/dashboard-stats";
-import { LinksList } from "./ui/links-list";
+import { UserLinksList } from "./ui/user-links-list";
 
 export default async function DashboardPage() {
   const [resultStats, resultLinks] = await Promise.all([
@@ -62,7 +63,7 @@ export default async function DashboardPage() {
           </TabsList>
 
           <TabsContent className="space-y-4 sm:space-y-6" value="links">
-            <LinksList links={resultLinks.links} />
+            <UserLinksList initialData={resultLinks} />
           </TabsContent>
 
           <TabsContent className="space-y-4 sm:space-y-6" value="create">
@@ -80,6 +81,7 @@ export default async function DashboardPage() {
           </TabsContent>
         </Tabs>
       </div>
+      <RedirectToTop />
     </main>
   );
 }

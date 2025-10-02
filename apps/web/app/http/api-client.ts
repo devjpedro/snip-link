@@ -2,7 +2,6 @@
 
 import { env } from "@snip-link/env";
 import ky from "ky";
-import { cookies } from "next/headers";
 import { DELAY } from "../constants/delay";
 
 function sleep(ms: number) {
@@ -24,6 +23,8 @@ export const api = ky.create({
 
         if (typeof window === "undefined") {
           try {
+            const { cookies } = await import("next/headers");
+
             const cookieStore = await cookies();
             const cookieHeader = cookieStore
               .getAll()

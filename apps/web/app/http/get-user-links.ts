@@ -22,11 +22,12 @@ export type UserLinks = {
 
 type Meta = {
   pageIndex: number;
+  nextPageIndex: number | null;
   pageSize: number;
   totalCount: number;
 };
 
-type UserLinksResponse = {
+export type UserLinksResponse = {
   links: UserLinks[];
   meta: Meta;
 };

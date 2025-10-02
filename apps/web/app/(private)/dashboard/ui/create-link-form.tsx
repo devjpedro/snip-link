@@ -14,6 +14,7 @@ import {
 import { Input } from "@snip-link/ui/components/input";
 import { Label } from "@snip-link/ui/components/label";
 import { Switch } from "@snip-link/ui/components/switch";
+import { useQueryClient } from "@tanstack/react-query";
 import { LinkIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -57,6 +58,8 @@ export const CreateLinkForm = () => {
   const [shortUrl, setShortUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
+  const queryClient = useQueryClient();
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -96,6 +99,9 @@ export const CreateLinkForm = () => {
 
     toast.success("Link criado com sucesso!");
     form.reset();
+    queryClient.invalidateQueries({
+      queryKey: ["user-links", res.data.shortId],
+    });
   };
 
   const handleCopy = async () => {
