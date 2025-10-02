@@ -18,10 +18,13 @@ type UseLinkListParams = {
   initialData: UserLinksResponse;
 };
 
+export type LinkFilterStatus = "all" | "active" | "inactive";
+
 const QUERY_KEY = "user-links";
 
 export const useLinksList = ({ initialData }: UseLinkListParams) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [status, setStatus] = useState<LinkFilterStatus>("all");
 
   const debouncedSearch = useDebounce(searchTerm, SHORT_DELAY);
   const queryClient = useQueryClient();
@@ -34,21 +37,21 @@ export const useLinksList = ({ initialData }: UseLinkListParams) => {
     isFetching,
     isRefetching,
   } = useInfiniteQuery({
-    queryKey: [QUERY_KEY, debouncedSearch],
+    queryKey: [QUERY_KEY, debouncedSearch, status],
     queryFn: async ({ pageParam }) => {
-      return api
-        .get("links", {
-          searchParams: {
-            pageIndex: pageParam,
-            searchText: debouncedSearch,
-          },
-        })
-        .json<UserLinksResponse>();
+      const searchParams: Record<string, string | number> = {
+        pageIndex: pageParam,
+        searchText: debouncedSearch,
+      };
+
+      if (status !== "all") searchParams.status = status;
+
+      return api.get("links", { searchParams }).json<UserLinksResponse>();
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.meta.nextPageIndex,
     placeholderData: (previousData) => previousData,
-    ...(debouncedSearch === ""
+    ...(debouncedSearch === "" && status === "all"
       ? {
           initialData: {
             pages: [initialData],
@@ -68,10 +71,11 @@ export const useLinksList = ({ initialData }: UseLinkListParams) => {
       const previousData = queryClient.getQueryData([
         QUERY_KEY,
         debouncedSearch,
+        status,
       ]);
 
       queryClient.setQueryData<typeof data>(
-        [QUERY_KEY, debouncedSearch],
+        [QUERY_KEY, debouncedSearch, status],
         (old) => {
           if (!old) return old;
           return {
@@ -91,7 +95,7 @@ export const useLinksList = ({ initialData }: UseLinkListParams) => {
     onError: (_, __, context) => {
       if (context?.previousData) {
         queryClient.setQueryData(
-          [QUERY_KEY, debouncedSearch],
+          [QUERY_KEY, debouncedSearch, status],
           context.previousData
         );
       }
@@ -112,10 +116,11 @@ export const useLinksList = ({ initialData }: UseLinkListParams) => {
       const previousData = queryClient.getQueryData([
         QUERY_KEY,
         debouncedSearch,
+        status,
       ]);
 
       queryClient.setQueryData<typeof data>(
-        [QUERY_KEY, debouncedSearch],
+        [QUERY_KEY, debouncedSearch, status],
         (old) => {
           if (!old) return old;
           return {
@@ -164,9 +169,12 @@ export const useLinksList = ({ initialData }: UseLinkListParams) => {
   );
 
   return {
-    searchTerm,
-    setSearchTerm,
     links,
+    searchTerm,
+    status,
+
+    setStatus,
+    setSearchTerm,
 
     fetchNextPage,
     hasNextPage,

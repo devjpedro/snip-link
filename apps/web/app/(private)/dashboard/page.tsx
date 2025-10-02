@@ -18,7 +18,7 @@ import { isApiSuccess } from "@/utils/api-guards";
 import { mapUserDashboardStats } from "@/utils/map-user-stats";
 import { CreateLinkForm } from "./ui/create-link-form";
 import { DashboardStats } from "./ui/dashboard-stats";
-import { UserLinksList } from "./ui/user-links-list";
+import { UserLinksListing } from "./ui/user-links-listing";
 
 export default async function DashboardPage() {
   const [resultStats, resultLinks] = await Promise.all([
@@ -63,7 +63,7 @@ export default async function DashboardPage() {
           </TabsList>
 
           <TabsContent className="space-y-4 sm:space-y-6" value="links">
-            <UserLinksList initialData={resultLinks} />
+            <UserLinksListing initialData={resultLinks} />
           </TabsContent>
 
           <TabsContent className="space-y-4 sm:space-y-6" value="create">
