@@ -19,11 +19,11 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
-import { memo, useState } from "react";
+import { memo } from "react";
 import { BASE_REDIRECT_URL } from "@/app/constants/base-redirect-url";
-import { LONG_DELAY } from "@/app/constants/delay";
 import type { UserLinks } from "@/app/http/get-user-links";
 import { ListSkeleton } from "@/components/skeletons/list-skeleton";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { formatDate } from "@/utils/format-date";
 import { truncateUrl } from "@/utils/truncate-url";
 import { InfiniteScrollContainer } from "./infinite-scroll-container";
@@ -47,13 +47,7 @@ function LinksListComponent({
   onDeleteLink,
   onUpdateLinkStatus,
 }: LinksListProps) {
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  const handleCopy = async (shortUrl: string, id: string) => {
-    await navigator.clipboard.writeText(`${BASE_REDIRECT_URL}/${shortUrl}`);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), LONG_DELAY);
-  };
+  const { copied, copy } = useCopyToClipboard(BASE_REDIRECT_URL);
 
   if (isFetching && !isFetchingNextPage && !isFetchingNextPage && !links)
     return (
@@ -111,11 +105,11 @@ function LinksListComponent({
 
                   <div className="flex items-center gap-2">
                     <Button
-                      onClick={() => handleCopy(link.shortId, link.id)}
+                      onClick={() => copy(link.shortId, link.id)}
                       size="sm"
                       variant="outline"
                     >
-                      {copiedId === link.id ? (
+                      {copied.has(link.id) ? (
                         <Check className="h-4 w-4 text-emerald-500" />
                       ) : (
                         <Copy className="h-4 w-4" />

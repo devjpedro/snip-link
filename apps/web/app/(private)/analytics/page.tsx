@@ -20,7 +20,7 @@ export default async function AnalyticsPage() {
 
   const cardsData = mapUserDashboardStats(data);
   const chartsData = data.charts;
-  // const popularLinks = data.popularLinks;
+  const popularLinks = data.popularLinks;
 
   return (
     <main className="container mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
@@ -36,7 +36,7 @@ export default async function AnalyticsPage() {
 
         <AnalyticsCharts charts={chartsData} />
 
-        <PopularLinks />
+        <PopularLinks links={popularLinks} />
       </div>
     </main>
   );

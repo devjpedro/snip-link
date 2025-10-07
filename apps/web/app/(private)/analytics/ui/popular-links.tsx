@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@snip-link/ui/components/badge";
 import { Button } from "@snip-link/ui/components/button";
 import {
   Card,
@@ -8,36 +7,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@snip-link/ui/components/card";
-import { BarChart3, Copy, ExternalLink } from "lucide-react";
+import { Check, Copy, ExternalLink } from "lucide-react";
+import { BASE_REDIRECT_URL } from "@/app/constants/base-redirect-url";
+import type { PopularLink } from "@/app/types/user-stats";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 
-const popularLinks = [
-  {
-    id: "1",
-    shortId: "projeto-github",
-    originalUrl: "https://github.com/usuario/projeto-incrivel",
-    clicks: 156,
-    isActive: true,
-  },
-  {
-    id: "2",
-    shortId: "artigo-dev",
-    originalUrl: "https://blog.exemplo.com/artigo-sobre-desenvolvimento",
-    clicks: 89,
-    isActive: false,
-  },
-  {
-    id: "3",
-    shortId: "xyz789",
-    originalUrl: "https://docs.exemplo.com/api/documentacao-completa",
-    clicks: 67,
-    isActive: true,
-  },
-];
-
-export const PopularLinks = () => {
-  const handleCopy = async (shortId: string) => {
-    await navigator.clipboard.writeText(`devlink.sh/s/${shortId}`);
-  };
+export const PopularLinks = ({ links }: { links: PopularLink[] }) => {
+  const { copied, copy } = useCopyToClipboard(BASE_REDIRECT_URL);
 
   const truncateUrl = (url: string, maxLength = 50) => {
     return url.length > maxLength ? `${url.substring(0, maxLength)}...` : url;
@@ -47,13 +23,12 @@ export const PopularLinks = () => {
     <Card className="border-border/50 bg-card/50 backdrop-blur">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="h-5 w-5" />
-          Links Mais Populares
+          Links ativos mais populares
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {popularLinks.map((link, index) => (
+          {links?.map((link, index) => (
             <div
               className="flex items-center justify-between rounded-lg bg-muted/30 p-4"
               key={link.id}
@@ -65,15 +40,14 @@ export const PopularLinks = () => {
 
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-semibold text-primary">
-                      devlink.sh/s/{link.shortId}
-                    </span>
-                    <Badge
-                      className="text-xs"
-                      variant={link.isActive ? "default" : "secondary"}
+                    <a
+                      className="max-w-full truncate font-mono font-semibold text-primary hover:underline"
+                      href={`${BASE_REDIRECT_URL}/${link.customAlias || link.shortId}`}
+                      rel="noopener noreferrer"
+                      target="_blank"
                     >
-                      {link.isActive ? "Ativo" : "Inativo"}
-                    </Badge>
+                      {BASE_REDIRECT_URL}/{link.customAlias || link.shortId}
+                    </a>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground text-sm">
                     <ExternalLink className="h-3 w-3" />
@@ -91,11 +65,15 @@ export const PopularLinks = () => {
                 </div>
 
                 <Button
-                  onClick={() => handleCopy(link.shortId)}
+                  onClick={() => copy(link.shortId, link.id)}
                   size="sm"
                   variant="ghost"
                 >
-                  <Copy className="h-4 w-4" />
+                  {copied.has(link.id) ? (
+                    <Check className="h-4 w-4 text-emerald-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>

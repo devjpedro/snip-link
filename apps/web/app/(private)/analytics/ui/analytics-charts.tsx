@@ -31,7 +31,7 @@ export const AnalyticsCharts = ({ charts }: { charts: Charts }) => {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <Card className="border-border/50 bg-card/50 backdrop-blur">
         <CardHeader>
-          <CardTitle>Cliques ao Longo do Tempo</CardTitle>
+          <CardTitle>Cliques ao longo do tempo</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer height={300} width="100%">
@@ -64,7 +64,7 @@ export const AnalyticsCharts = ({ charts }: { charts: Charts }) => {
 
       <Card className="border-border/50 bg-card/50 backdrop-blur">
         <CardHeader>
-          <CardTitle>Distribuição por Horário</CardTitle>
+          <CardTitle>Distribuição por horário</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer height={300} width="100%">
