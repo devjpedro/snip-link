@@ -1,3 +1,4 @@
+import { env } from "@snip-link/env";
 import { Github, LinkIcon, Mail, Twitter } from "lucide-react";
 import Link from "next/link";
 import { branding } from "@/app/constants/branding";
@@ -59,19 +60,19 @@ export function Footer() {
             <h3 className="mb-4 font-semibold">Recursos</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link
+                <a
                   className="text-muted-foreground transition-colors hover:text-foreground"
-                  href="http://localhost:3333/openapi"
+                  href={`${env.NEXT_PUBLIC_API_URL}/openapi`}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
                   Documentação
-                </Link>
+                </a>
               </li>
               <li>
                 <Link
                   className="text-muted-foreground transition-colors hover:text-foreground"
-                  href="http://localhost:3333/openapi"
+                  href={`${env.NEXT_PUBLIC_API_URL}/openapi`}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
@@ -81,7 +82,7 @@ export function Footer() {
               <li>
                 <Link
                   className="text-muted-foreground transition-colors hover:text-foreground"
-                  href="http://localhost:3333/openapi"
+                  href={`${env.NEXT_PUBLIC_API_URL}/openapi`}
                   rel="noopener noreferrer"
                   target="_blank"
                 >

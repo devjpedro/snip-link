@@ -4,6 +4,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
 import { db } from "../../db/client";
+import { getDomain } from "../utils/get-domain";
 
 const MAX_AGE = 7; // 7 days
 
@@ -19,9 +20,11 @@ export const auth = betterAuth({
     database: {
       generateId: false,
     },
+    cookiePrefix: "snip-link",
     useSecureCookies: process.env.NODE_ENV === "production",
     crossSubDomainCookies: {
       enabled: true,
+      domain: getDomain(env.BETTER_AUTH_URL),
     },
   },
   emailAndPassword: {
