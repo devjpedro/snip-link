@@ -19,6 +19,10 @@ export const auth = betterAuth({
     database: {
       generateId: false,
     },
+    useSecureCookies: env.NODE_ENV === "production",
+    crossSubDomainCookies: {
+      enabled: true,
+    },
   },
   emailAndPassword: {
     enabled: true,
