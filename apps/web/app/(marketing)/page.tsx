@@ -15,7 +15,7 @@ export default async function Page() {
         <HeroSection user={session?.user ?? null} />
         <StatsSection />
         <FeaturesSection />
-        <CTASection />
+        <CTASection user={session?.user ?? null} />
       </main>
       <Footer />
       <RedirectToTop />

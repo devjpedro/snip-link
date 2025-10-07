@@ -93,7 +93,7 @@ export const mapDashboardCards = (
     {
       title: "Links Ativos",
       value: (statsData?.activeLinks ?? 0).toString(),
-      change: `${statsData?.inactiveLinks ?? 0} inativos`,
+      change: `${statsData?.inactiveLinks ?? 0} ${statsData?.inactiveLinks === 1 ? "inativo" : "inativos"}`,
       icon: TrendingUp,
       color: "text-primary",
     },

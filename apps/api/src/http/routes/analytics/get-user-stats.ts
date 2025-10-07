@@ -57,36 +57,36 @@ const getAllUserStats = async (userId: string, chartDays = 30) => {
     .select({
       // Estatísticas gerais
       totalLinks: sql<number>`COUNT(DISTINCT ${links.id})`,
-      activeLinks: sql<number>`SUM(CASE WHEN ${links.isActive} = true THEN 1 ELSE 0 END)`,
+      activeLinks: sql<number>`COUNT(DISTINCT CASE WHEN ${links.isActive} = true THEN ${links.id} END)`,
       totalClicks: sql<number>`COUNT(${clicks.id})`,
 
       // Estatísticas do período
       todayClicks: sql<number>`SUM(CASE 
-        WHEN ${clicks.createdAt} >= ${today.toISOString()} 
-        THEN 1 ELSE 0 END)`,
+      WHEN ${clicks.createdAt} >= ${today.toISOString()} 
+      THEN 1 ELSE 0 END)`,
 
       yesterdayClicks: sql<number>`SUM(CASE 
-        WHEN ${clicks.createdAt} >= ${yesterday.toISOString()} 
-        AND ${clicks.createdAt} < ${today.toISOString()} 
-        THEN 1 ELSE 0 END)`,
+      WHEN ${clicks.createdAt} >= ${yesterday.toISOString()} 
+      AND ${clicks.createdAt} < ${today.toISOString()} 
+      THEN 1 ELSE 0 END)`,
 
       thisMonthClicks: sql<number>`SUM(CASE 
-        WHEN ${clicks.createdAt} >= ${monthAgo.toISOString()} 
-        THEN 1 ELSE 0 END)`,
+      WHEN ${clicks.createdAt} >= ${monthAgo.toISOString()} 
+      THEN 1 ELSE 0 END)`,
 
-      thisMonthLinks: sql<number>`SUM(CASE 
-        WHEN ${links.createdAt} >= ${monthAgo.toISOString()} 
-        THEN 1 ELSE 0 END)`,
+      thisMonthLinks: sql<number>`COUNT(DISTINCT CASE 
+      WHEN ${links.createdAt} >= ${monthAgo.toISOString()} 
+      THEN ${links.id} END)`,
 
       lastMonthClicks: sql<number>`SUM(CASE 
-        WHEN ${clicks.createdAt} >= ${lastMonthStart.toISOString()} 
-        AND ${clicks.createdAt} <= ${lastMonthEnd.toISOString()} 
-        THEN 1 ELSE 0 END)`,
+      WHEN ${clicks.createdAt} >= ${lastMonthStart.toISOString()} 
+      AND ${clicks.createdAt} <= ${lastMonthEnd.toISOString()} 
+      THEN 1 ELSE 0 END)`,
 
-      lastMonthLinks: sql<number>`SUM(CASE 
-        WHEN ${links.createdAt} >= ${lastMonthStart.toISOString()} 
-        AND ${links.createdAt} <= ${lastMonthEnd.toISOString()} 
-        THEN 1 ELSE 0 END)`,
+      lastMonthLinks: sql<number>`COUNT(DISTINCT CASE 
+      WHEN ${links.createdAt} >= ${lastMonthStart.toISOString()} 
+      AND ${links.createdAt} <= ${lastMonthEnd.toISOString()} 
+      THEN ${links.id} END)`,
     })
     .from(links)
     .leftJoin(clicks, eq(clicks.linkId, links.id))
