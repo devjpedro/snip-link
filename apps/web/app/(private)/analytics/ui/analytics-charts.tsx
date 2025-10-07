@@ -87,6 +87,9 @@ export const AnalyticsCharts = ({ charts }: { charts: Charts | null }) => {
                     valueText="Cliques"
                   />
                 }
+                cursor={{
+                  fill: "var(--muted)",
+                }}
               />
               <Bar
                 dataKey="clicks"
