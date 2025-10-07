@@ -1,8 +1,27 @@
+import { getUserStats } from "@/app/http/get-user-stats";
+import { isApiSuccess } from "@/utils/api-guards";
+import { mapUserDashboardStats } from "@/utils/map-user-stats";
 import { AnalyticsCharts } from "./ui/analytics-charts";
 import { AnalyticsOverview } from "./ui/analytics-overview";
 import { PopularLinks } from "./ui/popular-links";
 
-export default function AnalyticsPage() {
+export default async function AnalyticsPage() {
+  const userStats = await getUserStats();
+
+  if (!isApiSuccess(userStats)) {
+    return {
+      cardsData: null,
+      chartsData: null,
+      popularLinks: null,
+    };
+  }
+
+  const { data } = userStats;
+
+  const cardsData = mapUserDashboardStats(data);
+  // const chartsData = data.charts;
+  // const popularLinks = data.popularLinks;
+
   return (
     <main className="container mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <div className="space-y-6 sm:space-y-8">
@@ -13,7 +32,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
 
-        <AnalyticsOverview />
+        <AnalyticsOverview analytics={cardsData} />
 
         <AnalyticsCharts />
 

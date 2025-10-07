@@ -1,0 +1,1 @@
+CREATE INDEX "links_user_active_idx" ON "links" USING btree ("user_id","is_active");

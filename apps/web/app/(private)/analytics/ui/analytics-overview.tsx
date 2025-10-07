@@ -1,55 +1,17 @@
 "use client";
 
 import { MagicCard } from "@snip-link/ui/components/magic-card";
-import {
-  BarChart3,
-  Calendar,
-  Link2,
-  MousePointer,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react";
+import { TrendingDown, TrendingUp } from "lucide-react";
+import { mapAnalyticsCards } from "@/utils/map-cards";
+import type { MappedUserDashboardStats } from "@/utils/map-user-stats";
 
-const stats = [
-  {
-    title: "Total de Links",
-    value: "12",
-    change: "+2",
-    changeType: "increase" as const,
-    period: "este mês",
-    icon: Link2,
-    color: "text-primary",
-  },
-  {
-    title: "Total de Cliques",
-    value: "1,234",
-    change: "+15%",
-    changeType: "increase" as const,
-    period: "vs mês anterior",
-    icon: MousePointer,
-    color: "text-green-500",
-  },
-  {
-    title: "Cliques Hoje",
-    value: "25",
-    change: "-5%",
-    changeType: "decrease" as const,
-    period: "vs ontem",
-    icon: Calendar,
-    color: "text-primary",
-  },
-  {
-    title: "Taxa de Cliques",
-    value: "8.2%",
-    change: "+2.1%",
-    changeType: "increase" as const,
-    period: "vs mês anterior",
-    icon: BarChart3,
-    color: "text-orange-500",
-  },
-];
+type AnalyticsOverviewProps = {
+  analytics: MappedUserDashboardStats | null;
+};
 
-export const AnalyticsOverview = () => {
+export const AnalyticsOverview = ({ analytics }: AnalyticsOverviewProps) => {
+  const stats = mapAnalyticsCards(analytics);
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
       {stats.map((stat, index) => (

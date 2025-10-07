@@ -14,6 +14,11 @@ export type ClickOverTime = {
   clicks: number;
 };
 
+export type ClickByHour = {
+  hour: string;
+  clicks: number;
+};
+
 export type Overview = {
   totalLinks: number;
   activeLinks: number;
@@ -52,6 +57,7 @@ export type Growth = {
 
 export type Charts = {
   clicksOverTime: ClickOverTime[];
+  clicksByHour: ClickByHour[];
 };
 
 export type UserStatsData = {

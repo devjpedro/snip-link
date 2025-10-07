@@ -33,6 +33,7 @@ export const links = pgTable(
   (table) => [
     uniqueIndex("links_short_id_idx").on(table.shortId),
     index("links_user_id_idx").on(table.userId),
+    index("links_user_active_idx").on(table.userId, table.isActive),
     uniqueIndex("links_custom_alias_user_idx").on(
       table.customAlias,
       table.userId

@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, sql, sum } from "drizzle-orm";
+import { and, count, desc, eq, gte, sql } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { db } from "@/db/client";
 import { clicks } from "@/db/schema/clicks";
@@ -19,7 +19,13 @@ type PopularLinks = {
   clicks: number;
 }[];
 
+type ClicksByHour = {
+  hour: string;
+  clicks: number;
+}[];
+
 const DEFAULT_CHART_DAYS = 30;
+const LIMIT_POPULAR_LINKS = 5;
 
 const getAllUserStats = async (userId: string, chartDays = 30) => {
   const now = new Date();
@@ -50,53 +56,54 @@ const getAllUserStats = async (userId: string, chartDays = 30) => {
   const mainStatsQuery = db
     .select({
       // Estatísticas gerais
-      totalLinks: count(links.id),
-      activeLinks: sum(
-        sql`CASE WHEN ${links.isActive} = true THEN 1 ELSE 0 END`
-      ),
-      totalClicks: sum(sql`COALESCE((
-        SELECT COUNT(*) FROM ${clicks} 
-        WHERE ${clicks.linkId} = ${links.id}
-      ), 0)`),
+      totalLinks: sql<number>`COUNT(DISTINCT ${links.id})`,
+      activeLinks: sql<number>`SUM(CASE WHEN ${links.isActive} = true THEN 1 ELSE 0 END)`,
+      totalClicks: sql<number>`COUNT(${clicks.id})`,
 
       // Estatísticas do período
-      todayClicks: sum(sql`COALESCE((
-        SELECT COUNT(*) FROM ${clicks} 
-        WHERE ${clicks.linkId} = ${links.id} 
-        AND ${clicks.createdAt} >= ${today.toISOString()}
-      ), 0)`),
+      todayClicks: sql<number>`SUM(CASE 
+        WHEN ${clicks.createdAt} >= ${today.toISOString()} 
+        THEN 1 ELSE 0 END)`,
 
-      yesterdayClicks: sum(sql`COALESCE((
-        SELECT COUNT(*) FROM ${clicks} 
-        WHERE ${clicks.linkId} = ${links.id} 
-        AND ${clicks.createdAt} >= ${yesterday.toISOString()}
-        AND ${clicks.createdAt} < ${today.toISOString()}
-      ), 0)`),
+      yesterdayClicks: sql<number>`SUM(CASE 
+        WHEN ${clicks.createdAt} >= ${yesterday.toISOString()} 
+        AND ${clicks.createdAt} < ${today.toISOString()} 
+        THEN 1 ELSE 0 END)`,
 
-      thisMonthClicks: sum(sql`COALESCE((
-        SELECT COUNT(*) FROM ${clicks} 
-        WHERE ${clicks.linkId} = ${links.id} 
-        AND ${clicks.createdAt} >= ${monthAgo.toISOString()}
-      ), 0)`),
+      thisMonthClicks: sql<number>`SUM(CASE 
+        WHEN ${clicks.createdAt} >= ${monthAgo.toISOString()} 
+        THEN 1 ELSE 0 END)`,
 
-      thisMonthLinks: sum(
-        sql`CASE WHEN ${links.createdAt} >= ${monthAgo.toISOString()} THEN 1 ELSE 0 END`
-      ),
+      thisMonthLinks: sql<number>`SUM(CASE 
+        WHEN ${links.createdAt} >= ${monthAgo.toISOString()} 
+        THEN 1 ELSE 0 END)`,
 
-      lastMonthClicks: sum(sql`COALESCE((
-        SELECT COUNT(*) FROM ${clicks} 
-        WHERE ${clicks.linkId} = ${links.id} 
-        AND ${clicks.createdAt} >= ${lastMonthStart.toISOString()}
-        AND ${clicks.createdAt} <= ${lastMonthEnd.toISOString()}
-      ), 0)`),
+      lastMonthClicks: sql<number>`SUM(CASE 
+        WHEN ${clicks.createdAt} >= ${lastMonthStart.toISOString()} 
+        AND ${clicks.createdAt} <= ${lastMonthEnd.toISOString()} 
+        THEN 1 ELSE 0 END)`,
 
-      lastMonthLinks: sum(sql`CASE 
+      lastMonthLinks: sql<number>`SUM(CASE 
         WHEN ${links.createdAt} >= ${lastMonthStart.toISOString()} 
         AND ${links.createdAt} <= ${lastMonthEnd.toISOString()} 
-        THEN 1 ELSE 0 END`),
+        THEN 1 ELSE 0 END)`,
     })
     .from(links)
+    .leftJoin(clicks, eq(clicks.linkId, links.id))
     .where(eq(links.userId, userId));
+
+  const clicksByHourQuery = db
+    .select({
+      hour: sql<string>`CAST(EXTRACT(HOUR FROM ${clicks.createdAt}) AS TEXT)`.as(
+        "hour"
+      ),
+      clicks: count(),
+    })
+    .from(clicks)
+    .innerJoin(links, eq(clicks.linkId, links.id))
+    .where(and(eq(links.userId, userId), gte(clicks.createdAt, chartStartDate)))
+    .groupBy(sql`EXTRACT(HOUR FROM ${clicks.createdAt})`)
+    .orderBy(sql`EXTRACT(HOUR FROM ${clicks.createdAt})`);
 
   const clicksOverTimeQuery = db
     .select({
@@ -122,13 +129,15 @@ const getAllUserStats = async (userId: string, chartDays = 30) => {
     .where(and(eq(links.userId, userId), eq(links.isActive, true)))
     .groupBy(links.id, links.shortId, links.originalUrl, links.customAlias)
     .orderBy(desc(sql`COALESCE(COUNT(${clicks.id}), 0)`))
-    .limit(10);
+    .limit(LIMIT_POPULAR_LINKS);
 
-  const [mainStats, clicksOverTime, popularLinks] = await Promise.all([
-    mainStatsQuery,
-    clicksOverTimeQuery,
-    popularLinksQuery,
-  ]);
+  const [mainStats, clicksOverTime, popularLinks, clicksByHour] =
+    await Promise.all([
+      mainStatsQuery,
+      clicksOverTimeQuery,
+      popularLinksQuery,
+      clicksByHourQuery,
+    ]);
 
   return {
     mainStats: mainStats[0] || {
@@ -147,6 +156,7 @@ const getAllUserStats = async (userId: string, chartDays = 30) => {
       ...link,
       clicks: Number(link.clicks) || 0,
     })) as PopularLinks,
+    clicksByHour: clicksByHour as ClicksByHour,
   };
 };
 
@@ -183,10 +193,11 @@ export const getUserStats = new Elysia().use(betterAuthPlugin).get(
 
     try {
       // Uma única função que otimiza as consultas
-      const { mainStats, clicksOverTime, popularLinks } = await getAllUserStats(
-        user.id,
-        Number(query.days) || DEFAULT_CHART_DAYS
-      );
+      const { mainStats, clicksOverTime, popularLinks, clicksByHour } =
+        await getAllUserStats(
+          user.id,
+          Number(query.days) || DEFAULT_CHART_DAYS
+        );
 
       // Cálculos simples em memória
       const totalLinksNum = Number(mainStats.totalLinks);
@@ -268,6 +279,7 @@ export const getUserStats = new Elysia().use(betterAuthPlugin).get(
               date: item.date,
               clicks: item.clicks,
             })),
+            clicksByHour,
           },
           popularLinks: popularLinks.map((link) => ({
             id: link.id,

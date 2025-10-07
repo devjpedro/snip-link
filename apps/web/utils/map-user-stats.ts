@@ -10,6 +10,8 @@ export const mapUserDashboardStats = (data: UserStatsData) => {
     inactiveLinks: data.overview.inactiveLinks,
     clickRate: data.overview.clickRate,
     clickRateVsLastMonth: data.growth.clickRateVsLastMonth,
+    clicksToday: data.periods.today.clicks,
+    clicksVsYesterday: data.growth.clicksVsYesterday,
   };
 };
 
