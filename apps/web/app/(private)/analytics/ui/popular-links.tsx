@@ -30,10 +30,10 @@ export const PopularLinks = ({ links }: { links: PopularLink[] }) => {
         <div className="space-y-4">
           {links?.map((link, index) => (
             <div
-              className="flex items-center justify-between rounded-lg bg-muted/30 p-4"
+              className="flex flex-col items-start justify-between gap-3 rounded-lg bg-muted/30 p-2 sm:flex-row sm:items-center sm:gap-2 sm:p-4"
               key={link.id}
             >
-              <div className="flex min-w-0 flex-1 items-center gap-4">
+              <div className="flex min-w-0 max-w-fill flex-1 items-center gap-4">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary text-sm">
                   {index + 1}
                 </div>
@@ -58,8 +58,8 @@ export const PopularLinks = ({ links }: { links: PopularLink[] }) => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="text-right">
+              <div className="flex items-center gap-3 self-end sm:self-auto">
+                <div className="flex flex-row items-center gap-1 text-right sm:flex-col sm:items-end sm:gap-0">
                   <div className="font-semibold">{link.clicks}</div>
                   <div className="text-muted-foreground text-xs">cliques</div>
                 </div>

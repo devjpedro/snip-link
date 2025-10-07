@@ -18,6 +18,7 @@ import {
   YAxis,
 } from "recharts";
 import type { Charts } from "@/app/types/user-stats";
+import { CustomChartTooltip } from "@/components/custom-tooltip-chart";
 import { formatChartsData } from "@/utils/format-chart-data";
 
 const BAR_TOP_RADIUS = 4;
@@ -44,11 +45,13 @@ export const AnalyticsCharts = ({ charts }: { charts: Charts }) => {
               />
               <YAxis className="text-muted-foreground" fontSize={12} />
               <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--card)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "8px",
-                }}
+                content={
+                  <CustomChartTooltip
+                    labelKey="date"
+                    labelText="Data"
+                    valueText="Cliques"
+                  />
+                }
               />
               <Line
                 dataKey="clicks"
@@ -77,11 +80,13 @@ export const AnalyticsCharts = ({ charts }: { charts: Charts }) => {
               />
               <YAxis className="text-muted-foreground" fontSize={12} />
               <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--card)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "8px",
-                }}
+                content={
+                  <CustomChartTooltip
+                    labelKey="hour"
+                    labelText="Horário"
+                    valueText="Cliques"
+                  />
+                }
               />
               <Bar
                 dataKey="clicks"
