@@ -12,7 +12,7 @@ import { BASE_REDIRECT_URL } from "@/app/constants/base-redirect-url";
 import type { PopularLink } from "@/app/types/user-stats";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 
-export const PopularLinks = ({ links }: { links: PopularLink[] }) => {
+export const PopularLinks = ({ links }: { links: PopularLink[] | null }) => {
   const { copied, copy } = useCopyToClipboard(BASE_REDIRECT_URL);
 
   const truncateUrl = (url: string, maxLength = 50) => {

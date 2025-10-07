@@ -1,4 +1,5 @@
 import { getUserStats } from "@/app/http/get-user-stats";
+import type { Charts, PopularLink } from "@/app/types/user-stats";
 import { isApiSuccess } from "@/utils/api-guards";
 import { mapUserDashboardStats } from "@/utils/map-user-stats";
 import { AnalyticsCharts } from "./ui/analytics-charts";
@@ -8,19 +9,16 @@ import { PopularLinks } from "./ui/popular-links";
 export default async function AnalyticsPage() {
   const userStats = await getUserStats();
 
-  if (!isApiSuccess(userStats)) {
-    return {
-      cardsData: null,
-      chartsData: null,
-      popularLinks: null,
-    };
+  let cardsData: ReturnType<typeof mapUserDashboardStats> | null = null;
+  let chartsData: Charts | null = null;
+  let popularLinks: PopularLink[] | null = null;
+
+  if (isApiSuccess(userStats)) {
+    const { data } = userStats;
+    cardsData = mapUserDashboardStats(data);
+    chartsData = data.charts;
+    popularLinks = data.popularLinks;
   }
-
-  const { data } = userStats;
-
-  const cardsData = mapUserDashboardStats(data);
-  const chartsData = data.charts;
-  const popularLinks = data.popularLinks;
 
   return (
     <main className="container mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8">

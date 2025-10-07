@@ -23,7 +23,7 @@ import { formatChartsData } from "@/utils/format-chart-data";
 
 const BAR_TOP_RADIUS = 4;
 
-export const AnalyticsCharts = ({ charts }: { charts: Charts }) => {
+export const AnalyticsCharts = ({ charts }: { charts: Charts | null }) => {
   const formattedCharts = formatChartsData(charts);
 
   const { clicksOverTime, clicksByHour } = formattedCharts;

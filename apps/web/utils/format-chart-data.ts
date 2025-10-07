@@ -47,10 +47,18 @@ export const formatClicksByHour = (
   }));
 };
 
-export const formatChartsData = (charts: {
-  clicksOverTime: ClicksOverTimeRaw;
-  clicksByHour: ClicksByHourRaw;
-}) => {
+export const formatChartsData = (
+  charts: {
+    clicksOverTime: ClicksOverTimeRaw;
+    clicksByHour: ClicksByHourRaw;
+  } | null
+) => {
+  if (!charts)
+    return {
+      clicksOverTime: [],
+      clicksByHour: [],
+    };
+
   return {
     clicksOverTime: formatClicksOverTime(charts.clicksOverTime),
     clicksByHour: formatClicksByHour(charts.clicksByHour),
