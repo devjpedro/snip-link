@@ -14,7 +14,9 @@ export const clicks = pgTable(
     userAgent: text("user_agent"),
     ipAddress: text("ip_address"),
     referrer: text("referrer"),
-    createdAt: timestamp("created_at")
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+    })
       .$defaultFn(() => new Date())
       .notNull(),
   },

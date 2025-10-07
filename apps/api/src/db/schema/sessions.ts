@@ -9,12 +9,18 @@ export const sessions = pgTable("sessions", {
   userId: text("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  expiresAt: timestamp("expires_at").notNull(),
+  expiresAt: timestamp("expires_at", {
+    withTimezone: true,
+  }).notNull(),
   token: text("token").notNull().unique(),
-  createdAt: timestamp("created_at")
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+  })
     .$defaultFn(() => new Date())
     .notNull(),
-  updatedAt: timestamp("updated_at")
+  updatedAt: timestamp("updated_at", {
+    withTimezone: true,
+  })
     .$onUpdate(() => new Date())
     .notNull(),
   ipAddress: text("ip_address"),

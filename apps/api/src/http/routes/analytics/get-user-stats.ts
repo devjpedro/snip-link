@@ -94,7 +94,7 @@ const getAllUserStats = async (userId: string, chartDays = 30) => {
 
   const clicksByHourQuery = db
     .select({
-      hour: sql<string>`CAST(EXTRACT(HOUR FROM ${clicks.createdAt}) AS TEXT)`.as(
+      hour: sql<string>`CAST(EXTRACT(HOUR FROM ${clicks.createdAt} AT TIME ZONE 'America/Sao_Paulo') AS TEXT)`.as(
         "hour"
       ),
       clicks: count(),
@@ -102,19 +102,25 @@ const getAllUserStats = async (userId: string, chartDays = 30) => {
     .from(clicks)
     .innerJoin(links, eq(clicks.linkId, links.id))
     .where(and(eq(links.userId, userId), gte(clicks.createdAt, chartStartDate)))
-    .groupBy(sql`EXTRACT(HOUR FROM ${clicks.createdAt})`)
-    .orderBy(sql`EXTRACT(HOUR FROM ${clicks.createdAt})`);
+    .groupBy(
+      sql`EXTRACT(HOUR FROM ${clicks.createdAt} AT TIME ZONE 'America/Sao_Paulo')`
+    )
+    .orderBy(
+      sql`EXTRACT(HOUR FROM ${clicks.createdAt} AT TIME ZONE 'America/Sao_Paulo')`
+    );
 
   const clicksOverTimeQuery = db
     .select({
-      date: sql<string>`DATE(${clicks.createdAt})`.as("date"),
+      date: sql<string>`DATE(${clicks.createdAt} AT TIME ZONE 'America/Sao_Paulo')`.as(
+        "date"
+      ),
       clicks: count(),
     })
     .from(clicks)
     .innerJoin(links, eq(clicks.linkId, links.id))
     .where(and(eq(links.userId, userId), gte(clicks.createdAt, chartStartDate)))
-    .groupBy(sql`DATE(${clicks.createdAt})`)
-    .orderBy(sql`DATE(${clicks.createdAt})`);
+    .groupBy(sql`DATE(${clicks.createdAt} AT TIME ZONE 'America/Sao_Paulo')`)
+    .orderBy(sql`DATE(${clicks.createdAt} AT TIME ZONE 'America/Sao_Paulo')`);
 
   const popularLinksQuery = db
     .select({

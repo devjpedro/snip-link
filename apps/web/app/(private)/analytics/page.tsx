@@ -19,7 +19,7 @@ export default async function AnalyticsPage() {
   const { data } = userStats;
 
   const cardsData = mapUserDashboardStats(data);
-  // const chartsData = data.charts;
+  const chartsData = data.charts;
   // const popularLinks = data.popularLinks;
 
   return (
@@ -34,7 +34,7 @@ export default async function AnalyticsPage() {
 
         <AnalyticsOverview analytics={cardsData} />
 
-        <AnalyticsCharts />
+        <AnalyticsCharts charts={chartsData} />
 
         <PopularLinks />
       </div>

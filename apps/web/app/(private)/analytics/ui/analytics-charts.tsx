@@ -17,29 +17,16 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import type { Charts } from "@/app/types/user-stats";
+import { formatChartsData } from "@/utils/format-chart-data";
 
 const BAR_TOP_RADIUS = 4;
 
-const clicksData = [
-  { date: "18/01", clicks: 10 },
-  { date: "19/01", clicks: 15 },
-  { date: "20/01", clicks: 30 },
-  { date: "21/01", clicks: 55 },
-  { date: "22/01", clicks: 85 },
-  { date: "23/01", clicks: 159 },
-];
+export const AnalyticsCharts = ({ charts }: { charts: Charts }) => {
+  const formattedCharts = formatChartsData(charts);
 
-const hourlyData = [
-  { hour: "00:00", clicks: 2 },
-  { hour: "06:00", clicks: 5 },
-  { hour: "09:00", clicks: 25 },
-  { hour: "12:00", clicks: 45 },
-  { hour: "15:00", clicks: 35 },
-  { hour: "18:00", clicks: 55 },
-  { hour: "21:00", clicks: 30 },
-];
+  const { clicksOverTime, clicksByHour } = formattedCharts;
 
-export const AnalyticsCharts = () => {
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <Card className="border-border/50 bg-card/50 backdrop-blur">
@@ -48,7 +35,7 @@ export const AnalyticsCharts = () => {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer height={300} width="100%">
-            <LineChart data={clicksData}>
+            <LineChart data={clicksOverTime}>
               <CartesianGrid className="stroke-muted" strokeDasharray="3 3" />
               <XAxis
                 className="text-muted-foreground"
@@ -81,7 +68,7 @@ export const AnalyticsCharts = () => {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer height={300} width="100%">
-            <BarChart data={hourlyData}>
+            <BarChart data={clicksByHour}>
               <CartesianGrid className="stroke-muted" strokeDasharray="3 3" />
               <XAxis
                 className="text-muted-foreground"

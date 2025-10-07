@@ -22,10 +22,14 @@ export const links = pgTable(
     userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
     clickCount: integer("click_count").default(0).notNull(),
     isActive: boolean("is_active").default(true).notNull(),
-    createdAt: timestamp("created_at")
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+    })
       .$defaultFn(() => new Date())
       .notNull(),
-    updatedAt: timestamp("updated_at")
+    updatedAt: timestamp("updated_at", {
+      withTimezone: true,
+    })
       .$defaultFn(() => new Date())
       .$onUpdate(() => new Date())
       .notNull(),
