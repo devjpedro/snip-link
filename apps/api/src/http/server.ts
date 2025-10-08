@@ -34,7 +34,10 @@ const app = new Elysia()
   .use(redirectToUrl)
   .use(analyticsRoutes)
   .get("/health", () => "OK")
-  .listen(env.PORT);
+  .listen({
+    port: env.PORT,
+    hostname: "0.0.0.0",
+  });
 
 // biome-ignore lint/suspicious/noConsole: <Necessary for logging>
 console.log(
