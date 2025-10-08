@@ -9,6 +9,8 @@ export async function middleware(request: NextRequest) {
 
   const session = await getCookieCache(request, {
     secret: env.BETTER_AUTH_SECRET,
+    isSecure: process.env.NODE_ENV === "production",
+    cookiePrefix: "snip-link",
   });
 
   if (!(session || PUBLIC_PATHS.includes(path))) {
