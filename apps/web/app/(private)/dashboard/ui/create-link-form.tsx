@@ -14,15 +14,14 @@ import {
 import { Input } from "@snip-link/ui/components/input";
 import { Label } from "@snip-link/ui/components/label";
 import { Switch } from "@snip-link/ui/components/switch";
-import { useQueryClient } from "@tanstack/react-query";
 import { LinkIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import z from "zod";
 import { BASE_REDIRECT_URL } from "@/app/constants/base-redirect-url";
-import { LONG_DELAY } from "@/app/constants/delay";
 import { ResultLink } from "@/components/result-link";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { useCreateLink } from "@/hooks/use-create-link";
 import { createPrivateLinkAction } from "../actions";
 
 const MIN_ALIAS_LENGTH = 3;
@@ -56,9 +55,13 @@ type FormData = z.infer<typeof formSchema>;
 
 export const CreateLinkForm = () => {
   const [shortUrl, setShortUrl] = useState("");
-  const [copied, setCopied] = useState(false);
 
-  const queryClient = useQueryClient();
+  const { mutate: createLink } = useCreateLink({
+    mutationFn: createPrivateLinkAction,
+    onSuccess: (newShortUrl) => setShortUrl(newShortUrl),
+  });
+
+  const { copied, copy } = useCopyToClipboard();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -77,37 +80,11 @@ export const CreateLinkForm = () => {
   const handleFormSubmit = async (data: FormData) => {
     const { originalUrl, customAlias, isActive } = data;
 
-    setShortUrl("");
-
-    const res = await createPrivateLinkAction({
+    createLink({
       originalUrl,
       customAlias,
       isActive,
     });
-
-    if (res?.data?.existingLink) {
-      toast.info(res.error);
-      return;
-    }
-
-    if (!res.success) {
-      toast.error(res.error || "Ocorreu um erro. Tente novamente.");
-      return;
-    }
-
-    if (res.success && res.data) setShortUrl(res.data.shortUrl);
-
-    toast.success("Link criado com sucesso!");
-    form.reset();
-    queryClient.invalidateQueries({
-      queryKey: ["user-links", res.data.shortId],
-    });
-  };
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(shortUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), LONG_DELAY);
   };
 
   return (
@@ -210,8 +187,8 @@ export const CreateLinkForm = () => {
 
       {shortUrl && (
         <ResultLink
-          copied={copied}
-          handleCopy={handleCopy}
+          copied={copied.has(shortUrl)}
+          handleCopy={() => copy(shortUrl)}
           shortUrl={shortUrl}
         />
       )}
