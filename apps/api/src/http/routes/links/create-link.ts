@@ -5,7 +5,7 @@ import { links } from "@/db/schema/links";
 import { HTTP_STATUS } from "@/http/constants/http-status";
 import { betterAuthPlugin } from "@/http/plugins/better-auth";
 import { linkBodySchema, linkResponseSchema } from "@/http/schemas/create-link";
-import { checkIfAliasAlreadyExists } from "@/http/utils/check-exists";
+import { checkIfUrlAlreadyExists } from "@/http/utils/check-exists";
 import { validateUrlInput } from "@/http/utils/check-valid-url";
 import { generateUniqueShortId } from "@/http/utils/generate-short-id";
 import { processCustomAlias } from "@/http/utils/process-custom-alias";
@@ -21,6 +21,18 @@ type CreateLinkInDatabase = {
   customAlias: string | undefined;
   userId?: string;
   isActive?: boolean | undefined;
+};
+
+export const validateUrlExists = async (
+  customAlias: string | undefined,
+  originalUrl: string,
+  userId?: string
+) => {
+  if (customAlias || !userId) return null;
+
+  const aliasExists = await checkIfUrlAlreadyExists(originalUrl, userId);
+
+  return aliasExists;
 };
 
 export const createLinkInDatabase = async ({
@@ -80,9 +92,10 @@ export const createPrivateLink = new Elysia().use(betterAuthPlugin).post(
         };
       }
 
-      const existingUrlLink = await checkIfAliasAlreadyExists(
+      const existingUrlLink = await validateUrlExists(
+        customAlias,
         originalUrl,
-        user.id
+        user?.id
       );
 
       if (existingUrlLink) {

@@ -64,6 +64,33 @@ export const checkIfAliasAlreadyExists = async (
   return existing || null;
 };
 
+export const checkIfUrlAlreadyExists = async (
+  originalUrl: string,
+  userId: string
+): Promise<{
+  id: string;
+  shortId: string;
+  customAlias: string | null;
+  originalUrl: string;
+} | null> => {
+  const existing = await db.query.links.findFirst({
+    where: (linksTable, { eq, and }) =>
+      and(
+        eq(linksTable.userId, userId),
+        eq(linksTable.originalUrl, originalUrl),
+        eq(linksTable.isActive, true)
+      ),
+    columns: {
+      id: true,
+      shortId: true,
+      customAlias: true,
+      originalUrl: true,
+    },
+  });
+
+  return existing || null;
+};
+
 export const checkIfAnonymousUrlExists = async (
   originalUrl: string
 ): Promise<{

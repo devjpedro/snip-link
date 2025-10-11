@@ -1,75 +1,45 @@
 "use client";
 
-import { env } from "@snip-link/env";
 import { Button } from "@snip-link/ui/components/button";
 import { Card, CardContent } from "@snip-link/ui/components/card";
 import { Input } from "@snip-link/ui/components/input";
-import { useQueryClient } from "@tanstack/react-query";
 import type { User } from "better-auth";
 import { BarChart3, LinkIcon, Shield, Zap } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { branding } from "@/app/constants/branding";
-import { LONG_DELAY } from "@/app/constants/delay";
 import { ResultLink } from "@/components/result-link";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { useCreateLink } from "@/hooks/use-create-link";
 import { createLinkAction } from "../actions";
 
 export function HeroSection({ user }: { user: User | null }) {
   const [url, setUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
-  const [copied, setCopied] = useState(false);
 
-  const [isPending, startTransition] = useTransition();
+  const { copied, copy } = useCopyToClipboard();
 
-  const queryClient = useQueryClient();
+  const { mutate: createlink, isPending } = useCreateLink({
+    mutationFn: (urlToShorten: string) =>
+      createLinkAction(urlToShorten, user?.id),
+    onSuccess: (newShortUrl) => {
+      setShortUrl(newShortUrl);
+      setUrl("");
+    },
+  });
 
   const handleShorten = () => {
-    if (!url) return;
+    if (!url) {
+      toast.error("Por favor, insira uma URL válida.");
+      return;
+    }
 
     if (!(url.startsWith("http://") || url.startsWith("https://"))) {
       toast.error("Por favor, insira uma URL válida.");
       return;
     }
 
-    if (url.startsWith(env.NEXT_PUBLIC_API_URL)) {
-      toast.error("Não é possível encurtar uma URL do próprio serviço.");
-      setUrl("");
-      if (shortUrl) setShortUrl("");
-      return;
-    }
-
-    setShortUrl("");
-
-    startTransition(async () => {
-      const res = await createLinkAction(url, user?.id);
-
-      if (res?.data?.existingLink) {
-        setShortUrl(res.data.existingLink.shortUrl);
-        toast.info(res.error);
-        return;
-      }
-
-      if (!res.success) {
-        toast.error(res.error || "Ocorreu um erro. Tente novamente.");
-        return;
-      }
-
-      if (res.success && res.data) setShortUrl(res.data.shortUrl);
-
-      if (user) {
-        queryClient.invalidateQueries({
-          queryKey: ["user-links"],
-        });
-      }
-
-      setUrl("");
-    });
-  };
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(shortUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), LONG_DELAY);
+    createlink(url);
   };
 
   return (
@@ -135,8 +105,8 @@ export function HeroSection({ user }: { user: User | null }) {
 
                 {shortUrl && (
                   <ResultLink
-                    copied={copied}
-                    handleCopy={handleCopy}
+                    copied={copied.has(shortUrl)}
+                    handleCopy={() => copy(shortUrl)}
                     shortUrl={shortUrl}
                   />
                 )}
