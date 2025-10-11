@@ -1,6 +1,6 @@
 # Snip Link 🔗
 
-https://github.com/user-attachments/assets/3cbb0815-77c9-4e97-ae53-5badeadf9ea6
+[SnipLink preview](https://github.com/user-attachments/assets/60ed3257-c405-4c4c-8506-2c63773b809e)
 
 ![App Screenshot](https://jam.dev/cdn-cgi/image/width=1600,quality=100,dpr=1/https://cdn-jam-screenshots.jam.dev/d76bd5b4498d4552fabf57f3f57c8d08/screenshot/49ed874c-7e30-4d1e-8438-5893e29ddc01.png)
 
