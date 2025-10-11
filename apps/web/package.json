@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bun env:load next dev --turbopack",
     "build": "bun run env:load next build",
-    "start": "next start",
+    "start": "bun env:load next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "typecheck": "tsc --noEmit",

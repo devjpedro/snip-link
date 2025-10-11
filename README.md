@@ -1,135 +1,290 @@
-# Turborepo starter
+# Snip Link 🔗
 
-This Turborepo starter is maintained by the Turborepo core team.
+https://github.com/user-attachments/assets/3cbb0815-77c9-4e97-ae53-5badeadf9ea6
 
-## Using this example
+![App Screenshot](https://jam.dev/cdn-cgi/image/width=1600,quality=100,dpr=1/https://cdn-jam-screenshots.jam.dev/d76bd5b4498d4552fabf57f3f57c8d08/screenshot/49ed874c-7e30-4d1e-8438-5893e29ddc01.png)
 
-Run the following command:
+> Snip Link é um encurtador de links moderno e minimalista, construído com as tecnologias mais recentes.
+> O projeto oferece uma arquitetura escalável baseada em monorepo, com autenticação robusta, analytics em tempo real e uma interface elegante.
+> O objetivo desse projeto foi treinar minhas habilidades com Next.js e também colocar em prática novos conhecimentos em criação de API com Elysia
 
-```sh
-npx create-turbo@latest
-```
+## 🚀 Principais Recursos
 
-## What's inside?
+#### 🔐 Autenticação
 
-This Turborepo includes the following packages/apps:
+- Autenticação completa com Better Auth
+- Login e registro via email/senha
+- Gestão de sessões segura
+- Proteção de rotas no frontend e backend
 
-### Apps and Packages
+#### 🔗 Gestão de Links
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- Criação de links encurtados com aliases personalizados ou automáticos
+- Listagem e gerenciamento de todos os links criados
+- Ativação/desativação de links
+- Exclusão de links com histórico de cliques
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+#### 📊 Analytics Avançado
 
-### Utilities
+- Dashboard com estatísticas em tempo real
+- Gráficos de cliques ao longo do tempo
+- Métricas de total de cliques e links criados
+- Visualização de dados com Recharts
 
-This Turborepo has some additional tools already setup for you:
+#### 🎨 Interface Moderna
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- Design responsivo e acessível com Tailwind CSS
+- Componentes reutilizáveis com ShadCN UI
+- Tema claro/escuro
+- Animações suaves com Framer Motion
+- Infinite scroll para listagem de links
 
-### Build
+## Arquitetura e Stack de Tecnologias
 
-To build all apps and packages, run the following command:
+#### 🧱 Arquitetura
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+O projeto adota uma arquitetura **monorepo** utilizando **Turborepo** e **Bun workspaces**, organizando o código em aplicações separadas para **front-end**, **back-end**, e **módulos compartilhados** (UI, configurações de TypeScript, e variáveis de ambiente).
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+snip-link/
+├── apps/
+│   ├── api/              # Backend API (Elysia.js)
+│   └── web/              # Frontend (Next.js 15)
+├── packages/
+│   ├── ui/               # Componentes compartilhados
+│   ├── env/              # Variáveis de ambiente
+│   └── tsconfig/         # Configurações TypeScript
 ```
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+#### 🎨 Front-end
 
+Aplicação construída com **Next.js 15** e **React 19**, focada em uma interface moderna, acessível e responsiva. As principais bibliotecas e ferramentas incluem:
+
+- **Next.js 15** — framework React com App Router e Turbopack
+- **React 19** — biblioteca para interfaces de usuário
+- **Tailwind CSS** — estilização utilitária moderna
+- **ShadCN UI** — componentes acessíveis e estilizados
+- **Lucide React** — biblioteca de ícones SVG
+- **React Query** (`@tanstack/react-query`) — gerenciamento de estado assíncrono e cache
+- **Next Themes** — suporte a tema escuro/claro
+- **Framer Motion** — animações fluidas
+- **Recharts** — gráficos e visualização de dados
+- **Ky** — cliente HTTP leve baseado em `fetch`
+- **React Hook Form + Zod** — validação de formulários
+- **Better Auth** — autenticação no frontend
+- **Sonner** — notificações toast elegantes
+
+---
+
+#### ⚙️ Back-end
+
+API construída com **Elysia.js** rodando no **Bun runtime**, projetada para alta performance e validada com **Zod**. Utiliza **Drizzle ORM** para persistência com PostgreSQL.
+
+Principais tecnologias:
+
+- **Elysia.js** — framework web extremamente rápido para Bun
+- **Bun** — runtime JavaScript/TypeScript de alta performance
+- **Better Auth** — autenticação baseada em sessões e JWT
+- **Drizzle ORM** — ORM TypeScript-first para PostgreSQL
+- **PostgreSQL** — banco de dados relacional robusto
+- **Zod** — validação de schemas e entrada de dados
+- **Bcrypt** — hash seguro de senhas
+- **UUID** — geração de identificadores únicos
+- **@elysiajs/cors** — configuração de CORS
+- **@elysiajs/openapi** — documentação automática da API
+
+---
+
+#### 📦 Ferramentas e Qualidade
+
+- **Turborepo** — sistema de build otimizado para monorepos
+- **Bun** — gerenciador de pacotes e runtime
+- **TypeScript** — tipagem estática
+- **Ultracite** — linter e formatter baseado em Biome
+- **Husky** — git hooks para qualidade de código
+- **Docker Compose** — containerização do PostgreSQL
+
+## 🚀 Como rodar o projeto
+
+### ✅ Pré-requisitos
+
+Antes de começar, instale:
+
+- [Bun](https://bun.sh/) (recomendado: v1.2+) - `curl -fsSL https://bun.sh/install | bash`
+- [Docker](https://www.docker.com/) e Docker Compose
+- [Git](https://git-scm.com/)
+
+---
+
+### ⚡ Setup rápido (recomendado)
+
+O projeto já vem com um script `setup.sh` que faz tudo por você.
+
+```bash
+chmod +x setup.sh
+./setup.sh
 ```
-cd my-turborepo
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+O script irá:
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+1. ✅ Verificar se Bun e Docker estão instalados
+2. ✅ Instalar todas as dependências
+3. ✅ Configurar o arquivo `.env`
+4. ✅ Iniciar o PostgreSQL com Docker
+5. ✅ Rodar as migrations do banco de dados
+6. ✅ Iniciar a aplicação em modo desenvolvimento
+
+---
+
+### 🔧 Setup manual
+
+Se preferir fazer manualmente:
+
+#### 1. Clone o repositório
+
+```bash
+git clone https://github.com/devjpedro/snip-link.git
+cd snip-link
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+#### 2. Instale as dependências
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+bun install
 ```
 
-### Remote Caching
+#### 3. Configure as variáveis de ambiente
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+```bash
+cp .env.example .env
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Edite o arquivo `.env` com suas configurações:
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+```env
+# Database
+DATABASE_URL="postgresql://docker:docker@localhost:5432/snip-link-db"
 
+# Auth
+BETTER_AUTH_SECRET="your-secret-key-here"
+BETTER_AUTH_URL="http://localhost:3000"
+
+# API
+API_URL="http://localhost:3333"
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+#### 4. Inicie o banco de dados
+
+```bash
+docker compose up -d
 ```
 
-## Useful Links
+#### 5. Execute as migrations
 
-Learn more about the power of Turborepo:
+```bash
+cd apps/api
+bun run db:generate
+bun run db:migrate
+cd ../..
+```
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+#### 6. Inicie o projeto em modo dev
+
+```bash
+bun run dev
+```
+
+A aplicação estará disponível em:
+
+- 🌐 Frontend: http://localhost:3000
+- 🔌 API: http://localhost:3333
+- 📚 API Docs: http://localhost:3333/docs
+
+---
+
+## 📝 Scripts Disponíveis
+
+```bash
+# Desenvolvimento
+bun run dev              # Inicia todos os apps em modo dev
+bun run dev --filter=web # Inicia apenas o frontend
+bun run dev --filter=api # Inicia apenas a API
+
+# Build
+bun run build            # Build de produção de todos os apps
+
+# Qualidade de código
+bun run lint             # Verifica problemas de lint
+bun run check            # Verifica código com Ultracite
+bun run fix              # Corrige automaticamente problemas
+
+# Banco de dados (na pasta apps/api)
+cd apps/api
+bun run db:generate      # Gera migrations
+bun run db:migrate       # Executa migrations
+bun run db:studio        # Abre Drizzle Studio
+```
+
+---
+
+## 🗂️ Estrutura do Projeto
+
+### Apps
+
+#### `apps/api` - Backend API
+
+- Elysia.js + Bun runtime
+- Autenticação com Better Auth
+- Rotas para links, analytics e redirecionamento
+- Drizzle ORM + PostgreSQL
+
+#### `apps/web` - Frontend
+
+- Next.js 15 com App Router
+- Páginas: landing, auth, dashboard, analytics
+- Componentes reutilizáveis
+- Integração com API via React Query
+
+### Packages
+
+#### `packages/ui`
+
+- Componentes ShadCN UI customizados
+- Buttons, Forms, Cards, Charts, etc.
+- Estilos com Tailwind CSS
+
+#### `packages/env`
+
+- Validação de variáveis de ambiente
+- Compartilhado entre frontend e backend
+
+#### `packages/tsconfig`
+
+- Configurações TypeScript base
+- Configs específicas para web e api
+
+---
+
+## 🔐 Autenticação
+
+O projeto utiliza **Better Auth** para autenticação completa:
+
+- Registro e login com email/senha
+- Hash de senhas com bcrypt
+- Sessões seguras
+- Middleware de proteção de rotas
+- Sincronização entre frontend e backend
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT.
+
+---
+
+## 👤 Autor
+
+[@devjpedro](https://github.com/devjpedro)
