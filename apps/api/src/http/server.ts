@@ -7,13 +7,24 @@ import { analyticsRoutes } from "./routes/analytics";
 import { linksRoutes } from "./routes/links";
 import { redirectToUrl } from "./routes/redirect-to-url";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const app = new Elysia()
   .use(
     cors({
-      origin: env.NEXT_PUBLIC_BASE_URL,
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      origin: (request) => {
+        const origin = request.headers.get("origin");
+
+        if (isProduction) {
+          return origin?.endsWith(".up.railway.app") ?? false;
+        }
+
+        return origin?.includes("localhost") ?? false;
+      },
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
       credentials: true,
-      allowedHeaders: ["Content-Type", "Authorization"],
+      allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+      exposeHeaders: ["Authorization", "Set-Cookie"],
     })
   )
   .use(betterAuthPlugin)

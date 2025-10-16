@@ -13,15 +13,26 @@ export async function middleware(request: NextRequest) {
     cookiePrefix: "snip-link",
   });
 
-  if (!(session || PUBLIC_PATHS.includes(path))) {
+  const isPublicPath = PUBLIC_PATHS.includes(path);
+  const isAuthPath = path === "/login" || path === "/sign-up";
+
+  if (!(session || isPublicPath)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (session && (path === "/login" || path === "/sign-up")) {
+  if (session && isAuthPath) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+
+  if (process.env.NODE_ENV === "production") {
+    response.headers.set("X-Frame-Options", "DENY");
+    response.headers.set("X-Content-Type-Options", "nosniff");
+    response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  }
+
+  return response;
 }
 
 export const config = {

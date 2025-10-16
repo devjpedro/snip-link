@@ -6,10 +6,15 @@ import { openAPI } from "better-auth/plugins";
 import { db } from "../../db/client";
 
 const MAX_AGE = 7; // 7 days
+const isProduction = process.env.NODE_ENV === "production";
 
 export const auth = betterAuth({
   basePath: "/auth",
-  trustedOrigins: [env.NEXT_PUBLIC_BASE_URL, env.NEXT_PUBLIC_API_URL],
+  trustedOrigins: [
+    env.NEXT_PUBLIC_BASE_URL,
+    env.NEXT_PUBLIC_API_URL,
+    "https://*.up.railway.app",
+  ],
   plugins: [openAPI()],
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -20,10 +25,9 @@ export const auth = betterAuth({
       generateId: false,
     },
     cookiePrefix: "snip-link",
-    useSecureCookies: process.env.NODE_ENV === "production",
+    useSecureCookies: isProduction,
     crossSubDomainCookies: {
-      enabled: process.env.NODE_ENV === "production",
-      domain: ".up.railway.app",
+      enabled: false,
     },
   },
   emailAndPassword: {
