@@ -35,7 +35,7 @@ export const auth = betterAuth({
     autoSignIn: true,
     requireEmailVerification: false,
     password: {
-      hash: (password: string) => hashSync(password, 10),
+      hash: async (password: string) => hashSync(password, 10),
       verify: async ({ password, hash }) => verifySync(password, hash),
     },
   },
