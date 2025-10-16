@@ -2,7 +2,6 @@
 /** biome-ignore-all lint/style/noMagicNumbers: <Necessary magic number> */
 import cors from "@elysiajs/cors";
 import openapi from "@elysiajs/openapi";
-import { env } from "@snip-link/env";
 import Elysia from "elysia";
 import { betterAuthPlugin, OpenAPI } from "./plugins/better-auth";
 import { analyticsRoutes } from "./routes/analytics";
@@ -15,6 +14,11 @@ const railwayDomain = process.env.RAILWAY_PUBLIC_DOMAIN;
 const allowedOrigin = railwayDomain
   ? `https://${railwayDomain}`
   : "http://localhost:3000";
+
+const port = Number.parseInt(
+  process.env.API_PORT ?? process.env.PORT ?? "3333",
+  10
+);
 
 console.log("🔧 Initializing Elysia server...");
 console.log(`📍 Environment: ${process.env.NODE_ENV}`);
@@ -70,7 +74,7 @@ const app = new Elysia()
     };
   })
   .listen({
-    port: env.PORT || 3333,
+    port,
     hostname: "0.0.0.0",
   });
 
