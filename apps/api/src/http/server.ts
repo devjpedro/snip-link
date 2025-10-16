@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/suspicious/noConsole: <Necessary logs> */
+/** biome-ignore-all lint/style/noMagicNumbers: <Necessary magic number> */
 import cors from "@elysiajs/cors";
 import openapi from "@elysiajs/openapi";
 import { env } from "@snip-link/env";
@@ -8,23 +10,37 @@ import { linksRoutes } from "./routes/links";
 import { redirectToUrl } from "./routes/redirect-to-url";
 
 const isProduction = process.env.NODE_ENV === "production";
+const railwayDomain = process.env.RAILWAY_PUBLIC_DOMAIN;
+
+const allowedOrigin = railwayDomain
+  ? `https://${railwayDomain}`
+  : "http://localhost:3000";
+
+console.log("🔧 Initializing Elysia server...");
+console.log(`📍 Environment: ${process.env.NODE_ENV}`);
+console.log(`🔗 Allowed origin: ${allowedOrigin}`);
 
 const app = new Elysia()
+  .onStart(() => {
+    console.log("✅ Elysia plugins loaded");
+  })
   .use(
     cors({
       origin: (request) => {
         const origin = request.headers.get("origin");
 
+        if (!origin) return true;
+
         if (isProduction) {
-          return origin?.endsWith(".up.railway.app") ?? false;
+          return origin === allowedOrigin || origin.endsWith(".up.railway.app");
         }
 
-        return origin?.includes("localhost") ?? false;
+        return origin.includes("localhost");
       },
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
       credentials: true,
-      allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
-      exposeHeaders: ["Authorization", "Set-Cookie"],
+      allowedHeaders: ["Content-Type", "Authorization", "Cookie", "Set-Cookie"],
+      exposeHeaders: ["Set-Cookie", "Cookie", "Authorization"],
     })
   )
   .use(betterAuthPlugin)
@@ -44,13 +60,24 @@ const app = new Elysia()
   .use(linksRoutes)
   .use(redirectToUrl)
   .use(analyticsRoutes)
-  .get("/health", () => "OK")
+  .get("/health", () => {
+    console.log("✅ Health check called");
+    return {
+      status: "ok",
+      timestamp: Date.now(),
+      service: "snip-link-api",
+      version: "1.0.0",
+    };
+  })
   .listen({
-    port: env.PORT,
+    port: env.PORT || 3333,
     hostname: "0.0.0.0",
   });
 
-// biome-ignore lint/suspicious/noConsole: <Necessary for logging>
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+console.log(`
+╔══════════════════════════════════════╗
+║  🦊 Elysia Server Running           ║
+║  📍 ${app.server?.hostname}:${app.server?.port?.toString().padEnd(19)} ║
+║  🌍 ${(process.env.NODE_ENV || "development").padEnd(29)} ║
+╚══════════════════════════════════════╝
+`);

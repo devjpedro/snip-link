@@ -9,7 +9,7 @@
     "check": "bunx ultracite@latest check",
     "fix": "bunx ultracite@latest fix",
     "prepare": "husky",
-    "start:railway": "concurrently \"cd apps/api && bun run start\" \"cd apps/web && bun run start\""
+    "start:railway": "concurrently --kill-others --success first \"cd apps/api && bun run start\" \"sleep 10 && cd apps/web && bun run start\""
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.2",

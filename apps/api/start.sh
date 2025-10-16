@@ -12,5 +12,5 @@ bun run db:migrate || {
 }
 
 echo "✅ Migrations concluídas!"
-echo "🚀 Iniciando servidor..."
-bun run src/http/server.ts
+echo "🚀 Iniciando servidor API na porta 3333..."
+exec bun run src/http/server.ts
