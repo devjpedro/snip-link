@@ -1,5 +1,5 @@
+import { hashSync, verifySync } from "@node-rs/bcrypt";
 import { env } from "@snip-link/env";
-import bcrypt from "bcrypt";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
@@ -35,8 +35,8 @@ export const auth = betterAuth({
     autoSignIn: true,
     requireEmailVerification: false,
     password: {
-      hash: (password: string) => bcrypt.hash(password, 10),
-      verify: async ({ password, hash }) => bcrypt.compare(password, hash),
+      hash: (password: string) => hashSync(password, 10),
+      verify: async ({ password, hash }) => verifySync(password, hash),
     },
   },
   session: {
