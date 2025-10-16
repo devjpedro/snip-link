@@ -5,13 +5,16 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "env": [
         "BETTER_AUTH_SECRET",
         "BETTER_AUTH_URL",
         "DATABASE_URL",
         "NEXT_PUBLIC_BASE_URL",
-        "NEXT_PUBLIC_API_URL"
+        "NEXT_PUBLIC_API_URL",
+        "NODE_ENV",
+        "PORT",
+        "API_PORT"
       ]
     },
     "lint": {

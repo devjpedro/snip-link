@@ -2,9 +2,9 @@
   "name": "@snip-link/api",
   "version": "1.0.50",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun --watch --env-file ../../.env src/http/server.ts",
     "start": "./start.sh",
+    "build": "echo '✅ API build complete'",
     "db:generate": "bun --env-file ../../.env --bun drizzle-kit generate",
     "db:migrate": "bun --env-file ../../.env --bun drizzle-kit migrate",
     "db:studio": "bun --env-file ../../.env drizzle-kit studio"
@@ -22,10 +22,8 @@
   },
   "devDependencies": {
     "bun-types": "latest",
-    "drizzle-kit": "^0.31.4",
-    "node-gyp": "^11.4.2"
+    "drizzle-kit": "^0.31.4"
   },
-  "module": "src/index.js",
   "exports": {
     "./auth": "./src/http/lib/auth.ts"
   }
