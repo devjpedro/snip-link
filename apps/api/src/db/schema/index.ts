@@ -1,5 +1,6 @@
 import { accounts } from "./accounts";
 import { clicks } from "./clicks";
+import { jwkss } from "./jwks";
 import { links } from "./links";
 import { sessions } from "./sessions";
 import { users } from "./users";
@@ -14,4 +15,5 @@ export const schema = {
   verifications,
   links,
   clicks,
+  jwkss,
 };

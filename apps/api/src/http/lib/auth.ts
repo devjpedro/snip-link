@@ -1,29 +1,25 @@
 import { env } from "@snip-link/env";
 import bcrypt from "bcrypt";
-import { betterAuth } from "better-auth";
+import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { openAPI } from "better-auth/plugins";
+import { bearer, jwt, openAPI } from "better-auth/plugins";
 import { db } from "../../db/client";
+import { schema } from "../../db/schema";
 
 const MAX_AGE = 7; // 7 days
 
-export const auth = betterAuth({
+export const auth: ReturnType<typeof betterAuth> = betterAuth({
   basePath: "/auth",
   trustedOrigins: [env.NEXT_PUBLIC_BASE_URL, env.NEXT_PUBLIC_API_URL],
-  plugins: [openAPI()],
+  plugins: [openAPI(), jwt(), bearer()],
   database: drizzleAdapter(db, {
     provider: "pg",
     usePlural: true,
+    schema,
   }),
   advanced: {
     database: {
       generateId: false,
-    },
-    cookiePrefix: "snip-link",
-    useSecureCookies: process.env.NODE_ENV === "production",
-    crossSubDomainCookies: {
-      enabled: process.env.NODE_ENV === "production",
-      domain: ".up.railway.app",
     },
   },
   emailAndPassword: {
@@ -37,9 +33,5 @@ export const auth = betterAuth({
   },
   session: {
     expiresIn: 60 * 60 * 24 * MAX_AGE,
-    cookieCache: {
-      enabled: true,
-      maxAge: 60 * 60 * 24 * MAX_AGE,
-    },
   },
-});
+} satisfies BetterAuthOptions);

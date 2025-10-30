@@ -1,0 +1,1 @@
+ALTER TABLE "jwkss" ALTER COLUMN "createdAt" DROP DEFAULT;

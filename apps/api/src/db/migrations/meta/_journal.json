@@ -36,6 +36,27 @@
       "when": 1759867307879,
       "tag": "0004_messy_tyrannus",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1761839876681,
+      "tag": "0005_icy_vin_gonzales",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1761840073682,
+      "tag": "0006_worried_frank_castle",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1761840118238,
+      "tag": "0007_violet_justin_hammer",
+      "breakpoints": true
     }
   ]
 }

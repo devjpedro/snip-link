@@ -43,6 +43,7 @@ export function Header({ user }: HeaderProps) {
           setIsPending(false);
         },
         onSuccess: () => {
+          router.replace("/login");
           router.refresh();
         },
       },

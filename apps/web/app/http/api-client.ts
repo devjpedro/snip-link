@@ -1,5 +1,4 @@
 // biome-ignore-all lint/suspicious/noConsole: <Necessary>
-
 import { env } from "@snip-link/env";
 import ky from "ky";
 import { DELAY } from "../constants/delay";
@@ -24,7 +23,6 @@ export const api = ky.create({
         if (typeof window === "undefined") {
           try {
             const { cookies } = await import("next/headers");
-
             const cookieStore = await cookies();
             const cookieHeader = cookieStore
               .getAll()
