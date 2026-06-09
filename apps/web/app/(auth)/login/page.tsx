@@ -1,3 +1,4 @@
+import { env } from "@snip-link/env";
 import {
   Card,
   CardContent,
@@ -5,9 +6,12 @@ import {
   CardTitle,
 } from "@snip-link/ui/components/card";
 import Link from "next/link";
+import { GoogleSignInButton } from "@/components/google-sign-in-button";
 import { LoginForm } from "./ui/login-form";
 
 export default function LoginPage() {
+  const isGoogleMode = env.NEXT_PUBLIC_AUTH_MODE === "google";
+
   return (
     <main className="container mx-auto px-4 py-16">
       <div className="mx-auto max-w-md">
@@ -19,13 +23,24 @@ export default function LoginPage() {
             </p>
           </CardHeader>
           <CardContent>
-            <LoginForm />
-            <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">Não tem uma conta? </span>
-              <Link className="text-primary hover:underline" href="/sign-up">
-                Criar conta gratuita
-              </Link>
-            </div>
+            {isGoogleMode ? (
+              <GoogleSignInButton />
+            ) : (
+              <>
+                <LoginForm />
+                <div className="mt-6 text-center text-sm">
+                  <span className="text-muted-foreground">
+                    Não tem uma conta?{" "}
+                  </span>
+                  <Link
+                    className="text-primary hover:underline"
+                    href="/sign-up"
+                  >
+                    Criar conta gratuita
+                  </Link>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>

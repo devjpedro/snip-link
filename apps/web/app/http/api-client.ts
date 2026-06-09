@@ -7,8 +7,16 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const isServer = typeof window === "undefined";
+
+// No servidor (SSR / Server Actions) falamos com a API diretamente,
+// encaminhando os cookies manualmente (server-to-server não sofre com CORS nem
+// SameSite). No browser passamos pelo proxy same-origin "/api/proxy" (rewrite
+// no next.config -> Railway), de modo que o cookie de sessão seja first-party.
+const prefixUrl = isServer ? env.NEXT_PUBLIC_API_URL : "/api/proxy";
+
 export const api = ky.create({
-  prefixUrl: env.NEXT_PUBLIC_API_URL,
+  prefixUrl,
   headers: {
     "Content-Type": "application/json",
   },
@@ -20,7 +28,7 @@ export const api = ky.create({
           await sleep(DELAY);
         }
 
-        if (typeof window === "undefined") {
+        if (isServer) {
           try {
             const { cookies } = await import("next/headers");
             const cookieStore = await cookies();
