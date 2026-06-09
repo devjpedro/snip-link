@@ -75,7 +75,7 @@ export function GoogleSignInButton() {
         ) : (
           <GoogleIcon />
         )}
-        {isPending ? "Redirecionando..." : "Entrar com Google"}
+        {isPending ? "Redirecionando..." : "Continuar com Google"}
       </Button>
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { env } from "@snip-link/env";
 import { AnimatedThemeToggler } from "@snip-link/ui/components/animated-theme-toggler";
 import { Button } from "@snip-link/ui/components/button";
 import {
@@ -32,6 +33,9 @@ export function Header({ user }: HeaderProps) {
 
   const pathName = usePathname();
   const router = useRouter();
+
+  // No modo Google, login e cadastro são a mesma ação — um botão só.
+  const isGoogleMode = env.NEXT_PUBLIC_AUTH_MODE === "google";
 
   const handleClickLogout = async () => {
     await signOut({
@@ -87,19 +91,27 @@ export function Header({ user }: HeaderProps) {
           <AnimatedThemeToggler />
 
           <div className="hidden items-center space-x-3 sm:flex">
-            {!user && (
-              <>
-                <Button asChild size="sm" variant="ghost">
+            {!user &&
+              (isGoogleMode ? (
+                <Button asChild size="sm">
                   <Link href="/login">
                     <User className="mr-2 h-4 w-4" />
                     Entrar
                   </Link>
                 </Button>
-                <Button asChild size="sm">
-                  <Link href="/sign-up">Criar Conta</Link>
-                </Button>
-              </>
-            )}
+              ) : (
+                <>
+                  <Button asChild size="sm" variant="ghost">
+                    <Link href="/login">
+                      <User className="mr-2 h-4 w-4" />
+                      Entrar
+                    </Link>
+                  </Button>
+                  <Button asChild size="sm">
+                    <Link href="/sign-up">Criar Conta</Link>
+                  </Button>
+                </>
+              ))}
             {!!user && (
               <Button
                 disabled={isPending}
@@ -177,25 +189,38 @@ export function Header({ user }: HeaderProps) {
 
                 {!user && (
                   <div className="space-y-4 border-transparent border-t">
-                    <SheetClose asChild>
-                      <Button
-                        asChild
-                        className="h-10 w-full justify-start"
-                        size="sm"
-                        variant="ghost"
-                      >
-                        <Link href="/login">
-                          <User className="mr-2 h-4 w-4" />
-                          Entrar
-                        </Link>
-                      </Button>
-                    </SheetClose>
+                    {isGoogleMode ? (
+                      <SheetClose asChild>
+                        <Button asChild className="h-10 w-full" size="sm">
+                          <Link href="/login">
+                            <User className="mr-2 h-4 w-4" />
+                            Entrar
+                          </Link>
+                        </Button>
+                      </SheetClose>
+                    ) : (
+                      <>
+                        <SheetClose asChild>
+                          <Button
+                            asChild
+                            className="h-10 w-full justify-start"
+                            size="sm"
+                            variant="ghost"
+                          >
+                            <Link href="/login">
+                              <User className="mr-2 h-4 w-4" />
+                              Entrar
+                            </Link>
+                          </Button>
+                        </SheetClose>
 
-                    <SheetClose asChild>
-                      <Button asChild className="h-10 w-full" size="sm">
-                        <Link href="/sign-up">Criar Conta</Link>
-                      </Button>
-                    </SheetClose>
+                        <SheetClose asChild>
+                          <Button asChild className="h-10 w-full" size="sm">
+                            <Link href="/sign-up">Criar Conta</Link>
+                          </Button>
+                        </SheetClose>
+                      </>
+                    )}
                   </div>
                 )}
               </nav>

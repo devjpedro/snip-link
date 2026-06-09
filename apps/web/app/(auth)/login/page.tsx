@@ -17,9 +17,13 @@ export default function LoginPage() {
       <div className="mx-auto max-w-md">
         <Card className="border-border/50 bg-card/50 backdrop-blur">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Entrar na sua conta</CardTitle>
+            <CardTitle className="text-2xl">
+              {isGoogleMode ? "Entrar ou criar conta" : "Entrar na sua conta"}
+            </CardTitle>
             <p className="text-muted-foreground">
-              Acesse seu dashboard e gerencie seus links
+              {isGoogleMode
+                ? "Use sua conta Google — se ainda não tiver cadastro, criamos no seu primeiro acesso."
+                : "Acesse seu dashboard e gerencie seus links"}
             </p>
           </CardHeader>
           <CardContent>
