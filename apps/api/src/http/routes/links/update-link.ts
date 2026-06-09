@@ -315,7 +315,7 @@ export const updateLink = new Elysia().use(betterAuthPlugin).put(
           shortId: updatedLink.shortId,
           originalUrl: updatedLink.originalUrl,
           customAlias: updatedLink.customAlias,
-          shortUrl: `${env.BETTER_AUTH_URL}/${updatedLink.shortId}`,
+          shortUrl: `${env.BETTER_AUTH_URL}/r/${updatedLink.shortId}`,
           clickCount: updatedLink.clickCount,
           isActive: updatedLink.isActive,
           createdAt: updatedLink.createdAt,
