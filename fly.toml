@@ -1,0 +1,26 @@
+# Fly.io — API do SnipLink (ElysiaJS/Bun)
+# Região iad (us-east) para ficar perto do Neon (us-east-1) e da Vercel.
+app = "snip-link-api"
+primary_region = "iad"
+
+[build]
+
+[env]
+  PORT = "3333"
+
+[http_service]
+  internal_port = 3333
+  force_https = true
+  # Escala pra zero quando ocioso (você só paga quando há tráfego)...
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  # ...e nunca sobe além de 1 máquina (trava de custo contra picos).
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 150
+    hard_limit = 200
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
