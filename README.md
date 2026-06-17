@@ -13,7 +13,7 @@ de cliques e visualize tudo num dashboard com analytics em tempo real.
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
 ![Elysia](https://img.shields.io/badge/Elysia-API-blueviolet)
 
-🔗 **[sniplinkbr.vercel.app](https://sniplinkbr.vercel.app)**
+🔗 **[sniplinkjp.vercel.app](https://sniplinkjp.vercel.app)**
 
 ![App Screenshot](https://jam.dev/cdn-cgi/image/width=1600,quality=100,dpr=1/https://cdn-jam-screenshots.jam.dev/d76bd5b4498d4552fabf57f3f57c8d08/screenshot/49ed874c-7e30-4d1e-8438-5893e29ddc01.png)
 
@@ -41,7 +41,7 @@ domínio, e o **Next** faz proxy (rewrite no `next.config`) das rotas `/api/prox
 para o backend no Fly — mantendo o **cookie de sessão first-party**.
 
 ```
-Navegador ──▶ sniplinkbr.vercel.app (Next.js · Vercel)
+Navegador ──▶ sniplinkjp.vercel.app (Next.js · Vercel)
                   │  /api/proxy/* · /api/auth/*  (rewrite no next.config)
                   ▼
             snip-link-api.fly.dev (Elysia · Fly.io)
@@ -136,7 +136,7 @@ bun run --filter @snip-link/api db:studio     # Drizzle Studio
 ## Deploy
 
 Produção same-origin: **web na Vercel** + **API containerizada no Fly.io** + **Neon (Postgres)**.
-O front publica em `sniplinkbr.vercel.app` e encaminha `/api/*` para `snip-link-api.fly.dev` via
+O front publica em `sniplinkjp.vercel.app` e encaminha `/api/*` para `snip-link-api.fly.dev` via
 rewrite do Next, preservando o cookie first-party. Em produção o login roda em modo `google`.
 
 ## Licença
